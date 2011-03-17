@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -46,7 +46,7 @@ public class BuyAbilities extends JavaPlugin
 	IEconHandler eHandler;
 	IStorage storage;
 	IPermHandler pHandler;
-	Logger log;
+//	Logger log;
 	PluginManager pm;
 	public Settings settings;
 	AbilityManager abManager;

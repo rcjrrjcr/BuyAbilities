@@ -17,6 +17,10 @@ public final class EconFactory
 		{
 			return new EconEssentials(origin);
 		}
+		else if (pluginType == EconPlugin.NONE)
+		{
+			return new EconNone();
+		}
 		else
 		{
 			throw new Exception("Economy Interface was unable to be created!");

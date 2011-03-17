@@ -33,8 +33,6 @@ public class GroupManagerHandler implements IPermHandler {
 			this.plugin = (GroupManager) plugin;
 			dataHolder = this.plugin.getWorldsHolder();
 		}
-		
-		
 		return;		
 	}
 

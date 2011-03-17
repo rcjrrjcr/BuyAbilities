@@ -8,7 +8,7 @@ import com.rcjrrjcr.bukkitplugins.BuyAbilities.BuyAbilities;
 public final class PermFactory
 {
 	private static IPermHandler pHandler;
-	public static IPermHandler getInstance(PermPlugin pluginType,Plugin plugin,BuyAbilities origin) throws Exception
+	public final static IPermHandler getInstance(PermPlugin pluginType,Plugin plugin,BuyAbilities origin) throws Exception
 	{
 		IPermHandler newHandler;
 		if (pluginType == PermPlugin.PermYeti)
