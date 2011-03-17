@@ -57,6 +57,7 @@ public class ChatHelper {
 		int pageLines = linesPerPage - 1; //Lines of data not including header
 		if(pageLines == 0) return;
 		int start = (pageNo - 1) * pageLines; //Start position in string array
+//		System.out.println(data.size());
 		if(start > (data.size()-1))
 		{
 			sendMsgWrap(color,"BuyPermissions: No such page.",player);

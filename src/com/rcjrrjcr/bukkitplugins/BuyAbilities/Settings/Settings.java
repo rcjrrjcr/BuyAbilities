@@ -59,16 +59,20 @@ public class Settings {
 			ab.info.extName = yamlConfig.getString("Abilities."+abilityName+".info.name");
 			ab.info.desc = yamlConfig.getString("Abilities."+abilityName+".info.description");
 			ab.info.help = yamlConfig.getString("Abilities."+abilityName+".info.help");
-			ab.perms.addAll(yamlConfig.getStringList("Abilities."+abilityName+".permissions", null));
-			ab.category = yamlConfig.getString("Abilities."+abilityName+".category");
+			ab.perms.addAll(yamlConfig.getStringList("Abilities."+abilityName+".permissions", new ArrayList<String>()));
+			ab.categories = yamlConfig.getStringList("Abilities."+abilityName+".categories", new ArrayList<String>());
 			ab.costs.buy.set(yamlConfig.getInt("Abilities."+abilityName+"costs.buy.cost", 0),0,0);
 			ab.costs.rent.set(yamlConfig.getInt("Abilities."+abilityName+"costs.rent.cost", 0),yamlConfig.getInt("Abilities."+abilityName+"costs.rent.duration", 0),yamlConfig.getInt("Abilities."+abilityName+"costs.rent.uses", 0));
 //			ab.costs.use.set(yamlConfig.getInt("Abilities."+abilityName+"costs.use.cost", 0),0,yamlConfig.getInt("Abilities."+abilityName+"costs.buy.stock", 0));
 //			System.out.println(ab.name != null);
 			nameToAbilityMap.put(ab.name, ab);
 //			System.out.println(abilityNameToAbilityMap.toString());
-			if(!categoryToAbilityMap.containsKey(ab.category)) categoryToAbilityMap.put(ab.category, new HashSet<Ability>());
-			categoryToAbilityMap.get(ab.category).add(ab);
+//			System.out.println(ab.categories.size());
+			for(String category : ab.categories)
+			{
+				if(!categoryToAbilityMap.containsKey(category)) categoryToAbilityMap.put(category, new HashSet<Ability>());
+				categoryToAbilityMap.get(category).add(ab);
+			}
 		}
 		
 	}
@@ -86,23 +90,27 @@ public class Settings {
 	{
 		return nameToAbilityMap.get(abilityName).perms;
 	}
-	public String getCategory(String abilityName)
+	public List<String> getAbilityCategories(String abilityName)
 	{
-		return nameToAbilityMap.get(abilityName).category;
+		return nameToAbilityMap.get(abilityName).categories;
 	}
 	public List<String> getCategories(String world, Player player)
 	{
-		List<String> catergoryList = new ArrayList<String>();
+		List<String> categoryList = new ArrayList<String>();
+		//System.out.println(categoryList.size());
 		for(String category : categoryToAbilityMap.keySet())
 		{
-			if(origin.hasPermission(world, player.getName(), "bperm."+category.replace(" ", "."))) catergoryList.add(category);
+			if(origin.hasPermission(world, player.getName(), "buyabilities.abilities."+category.replace(' ', '.')))
+			{
+				categoryList.add(category);
+				//System.out.println(category);
+			}
 		}
-		return catergoryList;
+		return categoryList;
 	}
 	
 	public List<String> getAbilites(String categoryName)
 	{
-		//Fix this
 		if(categoryToAbilityMap.get(categoryName)==null) return null;
 		List<String> abList = new ArrayList<String>();
 		Set<Ability> abSet = categoryToAbilityMap.get(categoryName);
@@ -116,7 +124,12 @@ public class Settings {
 	public boolean canPurchase(String abilityName,String world, Player player)
 	{
 		if(nameToAbilityMap.get(abilityName) == null) return false;
-		return origin.hasPermission(world, player.getName(), "bperm."+nameToAbilityMap.get(abilityName).category.replace(" ", ".")  );
+		Ability ab = nameToAbilityMap.get(abilityName);
+		for(String categoryName : ab.categories)
+		{
+			 if(origin.hasPermission(world, player.getName(), "buyabilities.abilities."+categoryName.replace(' ', '.'))) return true;
+		}
+		return false;
 	}
 
 	public boolean canAccess(String categoryName,String world, Player player)
@@ -127,6 +140,24 @@ public class Settings {
 	public Ability getAbility(String abilityName)
 	{
 		return nameToAbilityMap.get(abilityName);
+	}
+	
+	public List<String> getAllAbilities(String worldName, Player player)
+	{
+		List<String> categories = getCategories(worldName,player);
+//		System.out.println(categories.size());
+		Set<String> abSet = new HashSet<String>();
+		for(String categoryName : categories)
+		{
+			Set<Ability> abList = categoryToAbilityMap.get(categoryName);
+			for(Ability ab : abList)
+			{
+				abSet.add(ab.name);
+			}
+		}
+		List<String> abList = new ArrayList<String>();
+		abList.addAll(abSet);
+		return abList;
 	}
 }
 

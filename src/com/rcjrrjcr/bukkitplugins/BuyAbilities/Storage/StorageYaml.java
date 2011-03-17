@@ -76,10 +76,10 @@ public class StorageYaml implements IStorage {
 					{
 						pAb.type = PurchasedAbilityType.RENT;
 					}
-					System.out.println(pAb.type.toString());
+					//System.out.println(pAb.type.toString());
 					pAb.world = world;
-					System.out.println(pAb.playerName);
-					System.out.println(pAb.toString());
+					//System.out.println(pAb.playerName);
+					//System.out.println(pAb.toString());
 					result.add(pAb);
 				}
 			}

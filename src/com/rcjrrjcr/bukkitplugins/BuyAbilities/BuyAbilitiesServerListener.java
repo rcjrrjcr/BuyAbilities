@@ -34,24 +34,24 @@ public class BuyAbilitiesServerListener extends ServerListener {
 		
 		if(!permActive)
 		{
-			permPlugin = plugin.getServer().getPluginManager().getPlugin("Permissions");
+			permPlugin = plugin.getServer().getPluginManager().getPlugin("GroupManager");
 			if(permPlugin != null)
 			{
 				if(permPlugin.isEnabled())
 				{
-					System.out.println("BuyAbilities: Hooking into Permissions.");
-					plugin.setPermissions(permPlugin, PermPlugin.PermYeti);
+					System.out.println("BuyAbilities: Hooking into GroupManager.");
+					plugin.setPermissions(permPlugin, PermPlugin.GroupManager);
 					permActive = true;
 					return;
 				}
 			}
 			else
 			{
-				permPlugin = plugin.getServer().getPluginManager().getPlugin("GroupManager");
+				permPlugin = plugin.getServer().getPluginManager().getPlugin("Permissions");
 				if(permPlugin != null && permPlugin.isEnabled())
 				{
-					System.out.println("BuyAbilities: Hooking into GroupManager.");
-					plugin.setPermissions(permPlugin, PermPlugin.GroupManager);
+					System.out.println("BuyAbilities: Hooking into Permissions.");
+					plugin.setPermissions(permPlugin, PermPlugin.PermYeti);
 					permActive = true;
 					return;
 				}
@@ -74,7 +74,7 @@ public class BuyAbilitiesServerListener extends ServerListener {
 			else
 			{
 				econPlugin = plugin.getServer().getPluginManager().getPlugin("Essentials");
-				if(econPlugin != null && permPlugin.isEnabled())
+				if(econPlugin != null && econPlugin.isEnabled())
 				{
 					System.out.println("BuyAbilities: Hooking into EssentialsEco.");
 					plugin.setEconomy(econPlugin, EconPlugin.ESSECO);
