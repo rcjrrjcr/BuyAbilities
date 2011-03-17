@@ -9,9 +9,9 @@ import com.rcjrrjcr.bukkitplugins.BuyAbilities.Storage.PurchasedAbilityType;
 
 public class AbilityManager
 {
-	private List<PurchasedAbility> rentedAbilities;
-	private HashMap<String,Set<PurchasedAbility>> currentAbilities;
-	private BuyAbilities origin;
+	List<PurchasedAbility> rentedAbilities;
+	HashMap<String,Set<PurchasedAbility>> currentAbilities;
+	BuyAbilities origin;
 	
 	public AbilityManager(BuyAbilities origin)
 	{
@@ -130,6 +130,7 @@ public class AbilityManager
 	{
 		for(PurchasedAbility p : rentedAbilities)
 		{
+			if(origin.getServer().getPlayer(p.playerName)==null||!origin.getServer().getPlayer(p.playerName).isOnline()) continue;
 			p.duration -= interval;
 			if(p.duration <= 0)
 			{

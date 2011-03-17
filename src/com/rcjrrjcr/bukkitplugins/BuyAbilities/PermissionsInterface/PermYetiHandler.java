@@ -27,6 +27,7 @@ public class PermYetiHandler implements IPermHandler {
 	@Override
 	public boolean hasPerm(String world,String playerName, String perm) {
 		if(!origin.active.isPermActive()) return false;
+		if(origin.getServer().getPlayer(playerName)==null)return false;
 		return permHandle.has(origin.getServer().getPlayer(playerName), perm);
 	}
 

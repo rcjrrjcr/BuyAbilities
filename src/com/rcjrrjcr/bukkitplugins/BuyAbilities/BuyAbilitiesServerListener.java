@@ -67,7 +67,7 @@ public class BuyAbilitiesServerListener extends ServerListener {
 				{
 					System.out.println("BuyAbilities: Hooking into iConomy.");
 					plugin.setEconomy(econPlugin, EconPlugin.IC4);
-					permActive = true;
+					econActive = true;
 					return;
 				}
 			}
@@ -78,6 +78,7 @@ public class BuyAbilitiesServerListener extends ServerListener {
 				{
 					System.out.println("BuyAbilities: Hooking into EssentialsEco.");
 					plugin.setEconomy(econPlugin, EconPlugin.ESSECO);
+					econActive = true;
 					return;
 				}
 			}

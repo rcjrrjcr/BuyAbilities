@@ -2,18 +2,20 @@ package com.rcjrrjcr.bukkitplugins.BuyAbilities.EconomyInterface;
 
 import org.bukkit.plugin.Plugin;
 
+import com.rcjrrjcr.bukkitplugins.BuyAbilities.BuyAbilities;
+
 
 public final class EconFactory
 {
-	public static IEconHandler getInstance(EconPlugin pluginType,Plugin plugin) throws Exception
+	public static IEconHandler getInstance(EconPlugin pluginType,Plugin plugin,BuyAbilities origin) throws Exception
 	{
 		if (pluginType == EconPlugin.IC4)
 		{
-			return new EconIC4Handler();
+			return new EconIC4Handler(origin);
 		}
 		else if (pluginType == EconPlugin.ESSECO)
 		{
-			return new EconEssentials();
+			return new EconEssentials(origin);
 		}
 		else
 		{

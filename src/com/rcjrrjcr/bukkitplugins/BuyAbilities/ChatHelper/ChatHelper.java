@@ -2,9 +2,11 @@ package com.rcjrrjcr.bukkitplugins.BuyAbilities.ChatHelper;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Vector;
 
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
@@ -31,6 +33,15 @@ public class ChatHelper {
 		}
 		return wrappedMsg.size();
 	}
+	public static int sendMsgWrap(String msg, CommandSender sender)
+	{
+		ArrayList<String> wrappedMsg = wrapLines(msg,null);
+		for(String s : wrappedMsg)
+		{
+			sender.sendMessage(s);
+		}
+		return wrappedMsg.size();
+	}
 	/**
 	 * Formats and sends a page of data to player's chat.
 	 * @author rcjrrjcr
@@ -41,7 +52,7 @@ public class ChatHelper {
 	 * @param pageNo Page number
 	 * @param player Player entity
 	 */
-	public static void paging(String pageHeader, ChatColor color, ArrayList<String> data, final int linesPerPage, final int pageNo, Player player)
+	public static void paging(String pageHeader, ChatColor color, List<String> data, final int linesPerPage, final int pageNo, Player player)
 	{
 		int pageLines = linesPerPage - 1; //Lines of data not including header
 		if(pageLines == 0) return;
@@ -54,7 +65,7 @@ public class ChatHelper {
 		int end = start + pageLines; //End position in string array (first string not to be processed)
 		if(end > (data.size() - 1))
 		{
-			end = data.size() - 1;
+			end = data.size();
 		}
 		int pageCount = divRoundUp(data.size(),pageLines);
 		if(pageNo > pageCount) 
@@ -79,10 +90,21 @@ public class ChatHelper {
 	public static ArrayList<String> wrapLines(String msg, ChatColor color)
 	{
 		ArrayList<String> splitMsg = new ArrayList<String>();
-		String[] split = wrapText(msg, (lineLength - color.toString().length()) );
-		for(int i = 0; i < split.length; i++)
+		if(color == null)
 		{
-			splitMsg.add(color.toString()+split[i]);
+			String[] split = wrapText(msg,lineLength );
+			for(int i = 0; i < split.length; i++)
+			{
+				splitMsg.add(split[i]);
+			}
+		}
+		else
+		{
+			String[] split = wrapText(msg, (lineLength - color.toString().length()) );
+			for(int i = 0; i < split.length; i++)
+			{
+				splitMsg.add(color.toString()+split[i]);
+			}
 		}
 		return splitMsg;
 	}

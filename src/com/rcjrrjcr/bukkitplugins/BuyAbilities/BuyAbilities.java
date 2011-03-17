@@ -2,8 +2,10 @@ package com.rcjrrjcr.bukkitplugins.BuyAbilities;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -25,6 +27,7 @@ import com.rcjrrjcr.bukkitplugins.BuyAbilities.ChatHelper.ChatHelper;
 import com.rcjrrjcr.bukkitplugins.BuyAbilities.PermissionsInterface.IPermHandler;
 import com.rcjrrjcr.bukkitplugins.BuyAbilities.PermissionsInterface.PermFactory;
 import com.rcjrrjcr.bukkitplugins.BuyAbilities.PermissionsInterface.PermPlugin;
+import com.rcjrrjcr.bukkitplugins.BuyAbilities.Settings.Ability;
 import com.rcjrrjcr.bukkitplugins.BuyAbilities.Settings.Settings;
 import com.rcjrrjcr.bukkitplugins.BuyAbilities.Storage.IStorage;
 import com.rcjrrjcr.bukkitplugins.BuyAbilities.Storage.StorageFactory;
@@ -188,7 +191,7 @@ public class BuyAbilities extends JavaPlugin
 			}
 			else
 			{
-				eHandler = EconFactory.getInstance(EconPlugin.ESSECO, econPlugin);
+				eHandler = EconFactory.getInstance(EconPlugin.ESSECO, econPlugin,this);
 			}
 		}
 		else if(!(econPlugin.isEnabled()))
@@ -197,7 +200,7 @@ public class BuyAbilities extends JavaPlugin
 		}
 		else
 		{
-			eHandler = EconFactory.getInstance(EconPlugin.IC4, econPlugin);
+			eHandler = EconFactory.getInstance(EconPlugin.IC4, econPlugin,this);
 		}
 		return econ;
 	}
@@ -213,7 +216,7 @@ public class BuyAbilities extends JavaPlugin
 	
 	
 	/**
-	 * Bukkit-called method. Processes commands that start with /bperm or /buyperm
+	 * Bukkit-called method. Processes commands that start with /bab or /buyab
 	 * @return true
 	 */
 	@Override
@@ -222,21 +225,269 @@ public class BuyAbilities extends JavaPlugin
 	    if (sender instanceof Player)
 	    {
 	    	Player player = (Player) sender;
-	    	if (commandName.equals("bperm")||commandName.equals("buyperms")) {
+	    	if (commandName.equals("buyab")||commandName.equals("bab")) {
 	    		return commandHandler(player,args);
 	    	}
 	    }
 	    else
 	    {
-	    	System.out.println("Testing onCommand");
+	    	if(commandName.equalsIgnoreCase("bab")||commandName.equalsIgnoreCase("buyab"))
+	    	{
+	    		if(args.length==0)
+	    		{
+	    			ChatHelper.sendMsgWrap("Incorrect syntax. Syntax /bab [hasperm|balance|listall].",sender);
+	    			return true;
+	    		}
+	    		if(args[0].equalsIgnoreCase("listall"))
+	    		{
+	    			ChatHelper.sendMsgWrap(abManager.currentAbilities.toString(), sender);
+	    			return true;
+	    		}
+	    		if(args[0].equalsIgnoreCase("balance"))
+	    		{
+	    			if(args.length != 2)
+	    			{
+		    			ChatHelper.sendMsgWrap("Incorrect syntax. Syntax /bab balance <playername>", sender);
+		    			return true;
+	    			}
+	    			Integer bal = balance(args[1]);
+	    			if(bal==null)
+	    			{
+		    			ChatHelper.sendMsgWrap("Player does not exist.", sender);
+		    			return true;
+	    			}
+	    			ChatHelper.sendMsgWrap("Player's balance:"+bal.toString(), sender);
+	    			return true;
+	    		}
+	    		if(args[0].equalsIgnoreCase("hasperm"))
+	    		{
+	    			if(args.length != 4)
+	    			{
+		    			ChatHelper.sendMsgWrap("Incorrect syntax. Syntax /bab hasperm <worldname> <playername> <nodename>", sender);
+		    			return true;
+	    			}
+	    			Boolean msg = (hasPermission(args[1],args[2],args[3]));
+	    			if(msg==null)
+	    			{
+		    			ChatHelper.sendMsgWrap("Player or world does not exist.", sender);
+		    			return true;
+	    			}
+	    			ChatHelper.sendMsgWrap("Does player have permission:"+msg.toString(), sender);
+	    			return true;
+	    		}
+	    		if(args[0].equalsIgnoreCase("commandtest"))
+	    		{
+	    			String cmd = commandName + " ";
+	    			for(int i = 0; i < args.length;i++)
+	    			{
+	    				cmd = cmd + " " + args[i];
+	    			}
+	    			ChatHelper.sendMsgWrap(cmd, sender);
+	    			return true;
+	    		}
+	    	}
 	    }
-	    return true;
+	    return false;
 	}
 	
 	boolean commandHandler(Player player, String[] args)
 	{
-		//TODO: Write command handlers here
-		return true;
+		if(args.length == 0)
+		{
+			ChatHelper.sendMsgWrap(ChatColor.GOLD,"Incorrect syntax. Syntax /bab [categories|category|page|current|buy|rent|info].",player);
+			return true;			
+		}
+		else if(args[0].equalsIgnoreCase("categories"))
+		{
+			if(args.length > 2)
+			{
+				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Incorrect syntax. Syntax /bab categories <pageno>", player);
+				return true;
+			}
+			String msg = "BuyAbilities: Category list: ";
+			List<String> catList = settings.getCategories(player.getWorld().getName(), player);
+			if(catList.isEmpty())
+			{
+				ChatHelper.sendMsgWrap(ChatColor.GOLD, "No categories accessible", player);
+				return true;
+			}
+			msg = msg + catList.get(0);
+			if(catList.size() > 1)
+			{
+				for(int i = 1; i < catList.size();i++)
+				{
+					msg = msg + ", " + catList.get(i);
+				}
+			}
+			ChatHelper.sendMsgWrap(ChatColor.GOLD, msg, player);
+			return true;
+		}
+		else if(args[0].equalsIgnoreCase("category"))
+		{
+			if(args.length > 3)
+			{
+				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Incorrect syntax. Syntax /bab category <categoryname> <pageno>", player);
+				return true;
+			}
+			int pageNo = 1;
+			if(args.length == 3)
+			{
+				try
+				{
+					pageNo = Integer.parseInt(args[2]);
+				}
+				catch(NumberFormatException e)
+				{
+					pageNo = 1;
+				}
+			}
+			List<String> abList = settings.getAbilites(args[1]);
+			if(abList==null||abList.isEmpty())
+			{
+				ChatHelper.sendMsgWrap(ChatColor.GOLD, "No abilities found in that category.", player);
+				return true;
+			}
+//			for(String ab : abList)
+//			{
+//				System.out.println(ab);
+//			}
+			ChatHelper.paging("BuyAbilities: Abilities in "+args[1], ChatColor.GOLD, abList , 6, pageNo, player);
+			return true;
+		}
+		else if(args[0].equalsIgnoreCase("page"))
+		{
+			if(args.length > 2)
+			{
+				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Incorrect syntax. Syntax /bab page <pageno>", player);
+				return true;
+			}
+			int pageNo = 1;
+			if(args.length == 2)
+			{
+				try
+				{
+					pageNo = Integer.parseInt(args[1]);
+				}
+				catch(NumberFormatException e)
+				{
+					pageNo = 1;
+				}
+			}
+			List<String> catList = settings.getCategories(player.getWorld().getName(), player);
+			if(catList==null)
+			{
+				ChatHelper.sendMsgWrap(ChatColor.GOLD, "No abilities accessible.", player);
+				return true;
+			}
+			List<String> abList = new LinkedList<String>();
+			for(String cat : catList)
+			{
+				List<String> catAbList = settings.getAbilites(cat);
+				if(catAbList!=null) abList.addAll(catAbList);
+			}
+			ChatHelper.paging("BuyAbilities: All abilities", ChatColor.GOLD, abList , 6, pageNo, player);
+			return true;
+		}
+		else if(args[0].equalsIgnoreCase("current"))
+		{
+			if(args.length > 2)
+			{
+				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Incorrect syntax. Syntax /bab current <pageno>", player);
+				return true;
+			}
+			int pageNo = 1;
+			if(args.length == 2)
+			{
+				try
+				{
+					pageNo = Integer.parseInt(args[1]);
+				}
+				catch(NumberFormatException e)
+				{
+					pageNo = 1;
+				}
+			}
+			Set<PurchasedAbility> currentAb = abManager.getPlayer(player.getName());
+			if(currentAb==null||currentAb.isEmpty())
+			{
+				ChatHelper.sendMsgWrap(ChatColor.GOLD, "No abilities are currently active.", player);
+				return true;
+			}
+			List<String> curAb = new LinkedList<String>();
+			for(PurchasedAbility p : currentAb)
+			{
+				curAb.add(p.toString());
+			}
+			ChatHelper.paging("BuyAbilities: All abilities", ChatColor.GOLD, curAb , 6, pageNo, player);
+			return true;
+		}
+		else if(args[0].equalsIgnoreCase("buy"))
+		{
+			if(args.length > 2)
+			{
+				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Incorrect syntax. Syntax /bab buy <abilityname>", player);
+				return true;
+			}
+			String abilityName = args[1];
+			Ability ab = settings.getAbility(abilityName);
+			if(ab==null)
+			{
+				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Ability not found.", player);
+				return true;
+			}
+			if(!eHandler.deduct(player, ab.costs.buy.cost))
+			{
+				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Insufficient funds.", player);
+				return true;
+			}
+			abManager.buyAbility(player.getWorld().getName(), player.getName(), abilityName);
+			ChatHelper.sendMsgWrap(ChatColor.GOLD,"Ability bought.", player);
+			return true;
+		}
+		else if(args[0].equalsIgnoreCase("rent"))
+		{
+			if(args.length > 2)
+			{
+				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Incorrect syntax. Syntax /bab rent <abilityname>", player);
+				return true;
+			}
+			String abilityName = args[1];
+			Ability ab = settings.getAbility(abilityName);
+			if(ab==null)
+			{
+				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Ability not found.", player);
+				return true;
+			}
+			if(!eHandler.deduct(player, ab.costs.buy.cost))
+			{
+				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Insufficient funds.", player);
+				return true;
+			}
+			abManager.rentAbility(player.getWorld().getName(), player.getName(), abilityName);
+			ChatHelper.sendMsgWrap(ChatColor.GOLD,"Ability rented.", player);
+			return true;
+		}
+		else if(args[0].equalsIgnoreCase("info"))
+		{
+			if(args.length > 2)
+			{
+				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Incorrect syntax. Syntax /bab info <abilityname>", player);
+				return true;
+			}
+			String abilityName = args[1];
+			Ability ab = settings.getAbility(abilityName);
+			if(ab==null)
+			{
+				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Ability not found.", player);
+				return true;
+			}
+
+			ChatHelper.sendMsgWrap(ChatColor.GOLD,ab.name+" from category "+ab.category, player);
+			ChatHelper.sendMsgWrap(ChatColor.GOLD,ab.info.desc, player);
+			ChatHelper.sendMsgWrap(ChatColor.GOLD,ab.costs.toString(), player);
+			return true;
+		}
+		return false;
 	}
 	/**
 	 * Print all available categories to player's chat
@@ -265,7 +516,7 @@ public class BuyAbilities extends JavaPlugin
 		if((econPlugin != null) && (type != EconPlugin.NONE))
 		{
 			try {
-				eHandler = EconFactory.getInstance(type, econPlugin);
+				eHandler = EconFactory.getInstance(type, econPlugin,this);
 			} catch (Exception e) {
 				e.printStackTrace();
 				return;
@@ -277,9 +528,18 @@ public class BuyAbilities extends JavaPlugin
 		if(!active.getStatus()) System.out.println("BuyAbilities: BuyAbilities inactive.");
 	}
 	
-	public boolean hasPermission(String world, Player player, String perm)
+	public Boolean hasPermission(String world, String playerName, String perm)
 	{
-		return pHandler.hasPerm(world, player.getName(), perm);
+		if(world==null||playerName==null||perm==null) return null;
+		if(getServer().getWorld(world)==null) return null;
+		if(getServer().getPlayer(playerName)==null) return null;
+		return pHandler.hasPerm(world, playerName, perm);
+	}
+	public Integer balance(String playerName)
+	{
+		if(playerName==null) return null;
+		if(getServer().getPlayer(playerName)==null) return null;
+		return (int) eHandler.getBalance(getServer().getPlayer(playerName));
 	}
 }
 

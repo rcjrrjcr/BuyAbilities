@@ -1,0 +1,15 @@
+name: BuyAbilities
+version: 0.5
+main: com.rcjrrjcr.bukkitplugins.BuyAbilities.BuyAbilities
+description: Allows the purchase of temporary abilities with iConomy money.
+authors:
+    - rcjrrjcr
+commands:
+    bab:
+        description: Alias for buyab
+        usage: /bab [help|info|page|category|current|buy|rent|info]
+    
+    buyab:
+        description: Buy abilities via this command
+        usage: /buyab [help|info|page|category|current|buy|rent|info]
+        

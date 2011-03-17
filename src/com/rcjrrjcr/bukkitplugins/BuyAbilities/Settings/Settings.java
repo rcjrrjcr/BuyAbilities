@@ -67,10 +67,7 @@ public class Settings {
 //			System.out.println(ab.name != null);
 			nameToAbilityMap.put(ab.name, ab);
 //			System.out.println(abilityNameToAbilityMap.toString());
-			if(!categoryToAbilityMap.containsKey(ab.category))
-			{
-				categoryToAbilityMap.put(ab.category, new HashSet<Ability>());
-			}
+			if(!categoryToAbilityMap.containsKey(ab.category)) categoryToAbilityMap.put(ab.category, new HashSet<Ability>());
 			categoryToAbilityMap.get(ab.category).add(ab);
 		}
 		
@@ -98,15 +95,19 @@ public class Settings {
 		List<String> catergoryList = new ArrayList<String>();
 		for(String category : categoryToAbilityMap.keySet())
 		{
-			if(origin.hasPermission(world, player, "bperm."+category.replace(" ", "."))) catergoryList.add(category);
+			if(origin.hasPermission(world, player.getName(), "bperm."+category.replace(" ", "."))) catergoryList.add(category);
 		}
 		return catergoryList;
 	}
 	
 	public List<String> getAbilites(String categoryName)
 	{
+		//Fix this
+		if(categoryToAbilityMap.get(categoryName)==null) return null;
 		List<String> abList = new ArrayList<String>();
-		for(Ability ab : categoryToAbilityMap.get(categoryName))
+		Set<Ability> abSet = categoryToAbilityMap.get(categoryName);
+		if(abSet==null||abSet.isEmpty()) return abList;
+		for(Ability ab : abSet)
 		{
 			abList.add(ab.name);
 		}
@@ -115,12 +116,12 @@ public class Settings {
 	public boolean canPurchase(String abilityName,String world, Player player)
 	{
 		if(nameToAbilityMap.get(abilityName) == null) return false;
-		return origin.hasPermission(world, player, "bperm."+nameToAbilityMap.get(abilityName).category.replace(" ", ".")  );
+		return origin.hasPermission(world, player.getName(), "bperm."+nameToAbilityMap.get(abilityName).category.replace(" ", ".")  );
 	}
 
 	public boolean canAccess(String categoryName,String world, Player player)
 	{
-		return origin.hasPermission(world, player, categoryName.replace(" ", ".")  );
+		return origin.hasPermission(world, player.getName(), categoryName.replace(" ", ".")  );
 	}
 	
 	public Ability getAbility(String abilityName)
