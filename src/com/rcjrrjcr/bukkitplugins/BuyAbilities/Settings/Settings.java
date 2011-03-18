@@ -111,14 +111,15 @@ public class Settings {
 	
 	public List<String> getAbilites(String categoryName)
 	{
-		if(categoryToAbilityMap.get(categoryName)==null) return null;
 		List<String> abList = new ArrayList<String>();
+		if(categoryToAbilityMap.get(categoryName)==null) return abList;
 		Set<Ability> abSet = categoryToAbilityMap.get(categoryName);
 		if(abSet==null||abSet.isEmpty()) return abList;
 		for(Ability ab : abSet)
 		{
 			abList.add(ab.name);
 		}
+		abSet = null;
 		return abList;
 	}
 	public boolean canPurchase(String abilityName,String world, Player player)
@@ -145,7 +146,6 @@ public class Settings {
 	public List<String> getAllAbilities(String worldName, Player player)
 	{
 		List<String> categories = getCategories(worldName,player);
-//		System.out.println(categories.size());
 		Set<String> abSet = new HashSet<String>();
 		for(String categoryName : categories)
 		{
@@ -155,8 +155,9 @@ public class Settings {
 				abSet.add(ab.name);
 			}
 		}
-		List<String> abList = new ArrayList<String>();
-		abList.addAll(abSet);
+		List<String> abList = new ArrayList<String>(abSet);
+		abSet = null;
+		categories = null;
 		return abList;
 	}
 }

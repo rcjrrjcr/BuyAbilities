@@ -28,7 +28,7 @@ public class BuyAbilitiesServerListener extends ServerListener {
 	@Override
 	public void onPluginEnabled(PluginEvent event)
 	{
-		System.out.println("PluginEnabled event detected!");
+		System.out.println("BuyAbilities: PluginEnabled event detected!");
 		Plugin permPlugin = null;
 		Plugin econPlugin = null;
 		

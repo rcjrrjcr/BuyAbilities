@@ -1,9 +1,7 @@
 package com.rcjrrjcr.bukkitplugins.BuyAbilities.ChatHelper;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Vector;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -54,8 +52,10 @@ public class ChatHelper {
 	 */
 	public static void paging(String pageHeader, ChatColor color, List<String> data, final int linesPerPage, final int pageNo, Player player)
 	{
+		if(pageNo < 1) return;
+		if(player == null) return;
 		int pageLines = linesPerPage - 1; //Lines of data not including header
-		if(pageLines == 0) return;
+		if(pageLines < 1) return;
 		int start = (pageNo - 1) * pageLines; //Start position in string array
 //		System.out.println(data.size());
 		if(start > (data.size()-1))
@@ -90,88 +90,83 @@ public class ChatHelper {
 	 */
 	public static ArrayList<String> wrapLines(String msg, ChatColor color)
 	{
-		ArrayList<String> splitMsg = new ArrayList<String>();
 		if(color == null)
 		{
-			String[] split = wrapText(msg,lineLength );
-			for(int i = 0; i < split.length; i++)
-			{
-				splitMsg.add(split[i]);
-			}
+			return wrapText(msg,lineLength);
 		}
 		else
 		{
-			String[] split = wrapText(msg, (lineLength - color.toString().length()) );
-			for(int i = 0; i < split.length; i++)
+			ArrayList<String> splitMsg =  wrapText(msg, (lineLength - color.toString().length()) );
+			for(String line : splitMsg)
 			{
-				splitMsg.add(color.toString()+split[i]);
+				line = color.toString() + line;
 			}
+			return splitMsg;
 		}
-		return splitMsg;
 	}
 	
 	/**
 	 * COPYCODE: Line wrapping algorithm from <a href="http://progcookbook.blogspot.com/2006/02/text-wrapping-function-for-java.html">Programmer's Cookbook</a> All credit goes to them.
+	 * Minor modifications (i.e force-wrapping when newline char is found, returning ArrayList<String>.) by rcjrrjcr.
 	 * @param text Text to wrap
 	 * @param len Line length
 	 * @return Array of wrapped strings
 	 * @author Robert Hanson 
 	 */
 	
-	public static String [] wrapText (String text, int len)
+	public static ArrayList<String> wrapText (String text, int len)
 	{
-	  // return empty array for null text
-	  if (text == null)
-	  return new String [] {};
+		// return empty array for null text
+		if (text == null) return new ArrayList<String>();
 
-	  // return text if len is zero or less
-	  if (len <= 0)
-	  return new String [] {text};
+		// return text if len is zero or less
+		// return text if less than length
+		if (len <= 0||text.length() <= len)
+		{
+			ArrayList<String> line = new ArrayList<String>();
+			line.add(text);
+			return line;
+		}
 
-	  // return text if less than length
-	  if (text.length() <= len)
-	  return new String [] {text};
 
-	  char [] chars = text.toCharArray();
-	  Vector<String> lines = new Vector<String>();
-	  StringBuffer line = new StringBuffer();
-	  StringBuffer word = new StringBuffer();
+		char [] chars = text.toCharArray();
+		ArrayList<String> lines = new ArrayList<String>();
+		StringBuffer line = new StringBuffer();
+		StringBuffer word = new StringBuffer();
 
-	  for (int i = 0; i < chars.length; i++) {
-	    word.append(chars[i]);
+		for (int i = 0; i < chars.length; i++) {
+			word.append(chars[i]);
 
-	    if (chars[i] == ' ') {
-	      if ((line.length() + word.length()) > len) {
-	        lines.add(line.toString());
-	        line.delete(0, line.length());
-	      }
+			if (chars[i] == ' ') {
+				if ((line.length() + word.length()) > len) {
+					lines.add(line.toString());
+					line.delete(0, line.length());
+				}
 
-	      line.append(word);
-	      word.delete(0, word.length());
-	    }
-	  }
+				line.append(word);
+				word.delete(0, word.length());
+			}
+			else if (chars[i] == '\n') {
+				lines.add(line.toString());
+				line.delete(0, line.length());
+				line.append(word);
+				word.delete(0, word.length());		
+			}
+		}
+		// handle any extra chars in current word
+		if (word.length() > 0) {
+			if ((line.length() + word.length()) > len) {
+				lines.add(line.toString());
+				line.delete(0, line.length());
+			}
+			line.append(word);
+		}
 
-	  // handle any extra chars in current word
-	  if (word.length() > 0) {
-	    if ((line.length() + word.length()) > len) {
-	      lines.add(line.toString());
-	      line.delete(0, line.length());
-	    }
-	    line.append(word);
-	  }
-
-	  // handle extra line
-	  if (line.length() > 0) {
-	    lines.add(line.toString());
-	  }
-
-	  String [] ret = new String[lines.size()];
-	  int c = 0; // counter
-	  for (Enumeration<String> e = lines.elements(); e.hasMoreElements(); c++) {
-	    ret[c] = (String) e.nextElement();
-	  }
-
-	  return ret;
+		// handle extra line
+		if (line.length() > 0) {
+			lines.add(line.toString());
+		}
+		return lines;
 	}
 	/**
 	 * Splits array of message into strings that fit in players chat. Refer to other overload.

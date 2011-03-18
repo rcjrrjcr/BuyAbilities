@@ -49,7 +49,7 @@ public class StorageYaml implements IStorage {
 		Map<String, ConfigurationNode> data = yamlConfig.getNodes("Data");
 		if(data == null)
 		{
-			System.out.println("Node \"Data:\" empty!");
+			System.out.println("BuyAbilities: Node \"Data:\" empty!");
 			return null;
 		}
 		ArrayList<PurchasedAbility> result = new ArrayList<PurchasedAbility>();
