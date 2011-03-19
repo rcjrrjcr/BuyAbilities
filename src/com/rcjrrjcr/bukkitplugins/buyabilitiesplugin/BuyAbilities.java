@@ -41,6 +41,7 @@ import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.Storage;
 public class BuyAbilities extends JavaPlugin
 {
 	
+	private static final ChatColor COLOR_CHAT = ChatColor.GOLD;
 	private BuyAbilitiesServerListener serverListener;
 	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
 	IEconHandler eHandler;
@@ -294,26 +295,26 @@ public class BuyAbilities extends JavaPlugin
 	{
 		if(!pHandler.hasPerm(player.getWorld().getName(), player.getName(), "buyabilities.use")) 
 		{
-			ChatHelper.sendMsgWrap(ChatColor.GOLD,"You do not have permissions to use this command.",player);
+			ChatHelper.sendMsgWrap(COLOR_CHAT,"You do not have permissions to use this command.",player);
 			return true;		
 		}
 		if(args.length == 0)
 		{
-			ChatHelper.sendMsgWrap(ChatColor.GOLD,"Incorrect syntax. Syntax /bab [categories|category|page|current|buy|rent|info].",player);
+			ChatHelper.sendMsgWrap(COLOR_CHAT,"Incorrect syntax. Syntax /bab [categories|category|page|current|buy|rent|info].",player);
 			return true;			
 		}
 		else if(args[0].equalsIgnoreCase("categories"))
 		{
 			if(args.length > 2)
 			{
-				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Incorrect syntax. Syntax /bab categories <pageno>", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Incorrect syntax. Syntax /bab categories <pageno>", player);
 				return true;
 			}
 			String msg = "BuyAbilities: Category list: ";
 			List<String> catList = settings.getCategories(player.getWorld().getName(), player);
 			if(catList.isEmpty())
 			{
-				ChatHelper.sendMsgWrap(ChatColor.GOLD, "No categories accessible", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT, "No categories accessible", player);
 				return true;
 			}
 			msg = msg + catList.get(0);
@@ -324,14 +325,14 @@ public class BuyAbilities extends JavaPlugin
 					msg = msg + ", " + catList.get(i);
 				}
 			}
-			ChatHelper.sendMsgWrap(ChatColor.GOLD, msg, player);
+			ChatHelper.sendMsgWrap(COLOR_CHAT, msg, player);
 			return true;
 		}
 		else if(args[0].equalsIgnoreCase("category"))
 		{
 			if(args.length > 3)
 			{
-				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Incorrect syntax. Syntax /bab category <categoryname> <pageno>", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Incorrect syntax. Syntax /bab category <categoryname> <pageno>", player);
 				return true;
 			}
 			int pageNo = 1;
@@ -349,21 +350,21 @@ public class BuyAbilities extends JavaPlugin
 			List<String> abList = settings.getAbilites(args[1]);
 			if(abList==null||abList.isEmpty())
 			{
-				ChatHelper.sendMsgWrap(ChatColor.GOLD, "No abilities found in that category.", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT, "No abilities found in that category.", player);
 				return true;
 			}
 //			for(String ab : abList)
 //			{
 //				System.out.println(ab);
 //			}
-			ChatHelper.paging("BuyAbilities: Abilities in "+args[1], ChatColor.GOLD, abList , 6, pageNo, player);
+			ChatHelper.paging("BuyAbilities: Abilities in "+args[1], COLOR_CHAT, abList , 6, pageNo, player);
 			return true;
 		}
 		else if(args[0].equalsIgnoreCase("page"))
 		{
 			if(args.length > 2)
 			{
-				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Incorrect syntax. Syntax /bab page <pageno>", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Incorrect syntax. Syntax /bab page <pageno>", player);
 				return true;
 			}
 			int pageNo = 1;
@@ -382,17 +383,17 @@ public class BuyAbilities extends JavaPlugin
 			List<String> abList = settings.getAllAbilities(player.getWorld().getName(), player);
 			if(abList == null||abList.isEmpty())
 			{
-				ChatHelper.sendMsgWrap(ChatColor.GOLD,"No abilities found.", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"No abilities found.", player);
 				return true;
 			}
-			ChatHelper.paging("BuyAbilities: All abilities", ChatColor.GOLD, abList , 6, pageNo, player);
+			ChatHelper.paging("BuyAbilities: All abilities", COLOR_CHAT, abList , 6, pageNo, player);
 			return true;
 		}
 		else if(args[0].equalsIgnoreCase("current"))
 		{
 			if(args.length > 2)
 			{
-				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Incorrect syntax. Syntax /bab current <pageno>", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Incorrect syntax. Syntax /bab current <pageno>", player);
 				return true;
 			}
 			int pageNo = 1;
@@ -410,7 +411,7 @@ public class BuyAbilities extends JavaPlugin
 			Set<PurchasedAbility> currentAb = abManager.getPlayer(player.getName());
 			if(currentAb==null||currentAb.isEmpty())
 			{
-				ChatHelper.sendMsgWrap(ChatColor.GOLD, "No abilities are currently active.", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT, "No abilities are currently active.", player);
 				return true;
 			}
 			List<String> curAb = new LinkedList<String>();
@@ -418,67 +419,67 @@ public class BuyAbilities extends JavaPlugin
 			{
 				curAb.add(p.toString());
 			}
-			ChatHelper.paging("BuyAbilities: All abilities", ChatColor.GOLD, curAb , 6, pageNo, player);
+			ChatHelper.paging("BuyAbilities: All abilities", COLOR_CHAT, curAb , 6, pageNo, player);
 			return true;
 		}
 		else if(args[0].equalsIgnoreCase("buy"))
 		{
 			if(args.length != 2)
 			{
-				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Incorrect syntax. Syntax /bab buy <abilityname>", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Incorrect syntax. Syntax /bab buy <abilityname>", player);
 				return true;
 			}
 			String abilityName = args[1];
 			Ability ab = settings.getAbility(abilityName);
 			if(ab==null)
 			{
-				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Ability not found.", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Ability not found.", player);
 				return true;
 			}
 			if(!eHandler.deduct(player, ab.costs.buy.cost))
 			{
-				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Insufficient funds.", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Insufficient funds.", player);
 				return true;
 			}
 			abManager.buyAbility(player.getWorld().getName(), player.getName(), abilityName);
-			ChatHelper.sendMsgWrap(ChatColor.GOLD,"Ability bought.", player);
+			ChatHelper.sendMsgWrap(COLOR_CHAT,"Ability bought.", player);
 			return true;
 		}
 		else if(args[0].equalsIgnoreCase("rent"))
 		{
 			if(args.length != 2)
 			{
-				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Incorrect syntax. Syntax /bab rent <abilityname>", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Incorrect syntax. Syntax /bab rent <abilityname>", player);
 				return true;
 			}
 			String abilityName = args[1];
 			Ability ab = settings.getAbility(abilityName);
 			if(ab==null)
 			{
-				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Ability not found.", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Ability not found.", player);
 				return true;
 			}
 			if(!eHandler.deduct(player, ab.costs.buy.cost))
 			{
-				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Insufficient funds.", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Insufficient funds.", player);
 				return true;
 			}
 			abManager.rentAbility(player.getWorld().getName(), player.getName(), abilityName);
-			ChatHelper.sendMsgWrap(ChatColor.GOLD,"Ability rented.", player);
+			ChatHelper.sendMsgWrap(COLOR_CHAT,"Ability rented.", player);
 			return true;
 		}
 		else if(args[0].equalsIgnoreCase("info"))
 		{
 			if(args.length != 2)
 			{
-				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Incorrect syntax. Syntax /bab info <abilityname>", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Incorrect syntax. Syntax /bab info <abilityname>", player);
 				return true;
 			}
 			String abilityName = args[1];
 			Ability ab = settings.getAbility(abilityName);
 			if(ab==null)
 			{
-				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Ability not found.", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Ability not found.", player);
 				return true;
 			}
 			String catString = "";
@@ -488,29 +489,33 @@ public class BuyAbilities extends JavaPlugin
 				catString = catString + cat + "/";
 			}
 			if(catString.length() > 0)catString = catString.substring(0, catString.length() - 2);
-			ChatHelper.sendMsgWrap(ChatColor.GOLD,ab.name+" from category/categories "+catString, player);
-			ChatHelper.sendMsgWrap(ChatColor.GOLD,ab.info.desc, player);
-			ChatHelper.sendMsgWrap(ChatColor.GOLD,ab.costs.toString(), player);
+			ChatHelper.sendMsgWrap(COLOR_CHAT,ab.name+" from category/categories "+catString, player);
+			ChatHelper.sendMsgWrap(COLOR_CHAT,ab.info.desc, player);
+			ChatHelper.sendMsgWrap(COLOR_CHAT,ab.costs.toString(), player);
 			return true;
 		}
 		else if(args[0].equalsIgnoreCase("help"))
 		{
 			if(args.length != 2)
 			{
-				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Incorrect syntax. Syntax /bab help <abilityname>", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Incorrect syntax. Syntax /bab help <abilityname>", player);
 				return true;
 			}
 			String abilityName = args[1];
 			Ability ab = settings.getAbility(abilityName);
 			if(ab==null)
 			{
-				ChatHelper.sendMsgWrap(ChatColor.GOLD,"Ability not found.", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Ability not found.", player);
 				return true;
 			}
-			ChatHelper.sendMsgWrap(ChatColor.GOLD,ab.info.help, player);
+			ChatHelper.sendMsgWrap(COLOR_CHAT,ab.info.help, player);
 			return true;
 		}
-		return false;
+		else
+		{
+			ChatHelper.sendMsgWrap(COLOR_CHAT,"Incorrect syntax. Syntax /bab [categories|category|page|current|buy|rent|info|help].",player);
+			return true;
+		}
 	}
 	/**
 	 * Print all available categories to player's chat

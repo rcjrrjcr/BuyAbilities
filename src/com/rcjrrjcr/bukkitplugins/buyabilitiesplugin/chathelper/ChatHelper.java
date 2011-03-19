@@ -97,11 +97,12 @@ public class ChatHelper {
 		else
 		{
 			ArrayList<String> splitMsg =  wrapText(msg, (lineLength - color.toString().length()) );
+			ArrayList<String> coloredSplit = new ArrayList<String>(splitMsg.size());
 			for(String line : splitMsg)
 			{
-				line = color.toString() + line;
+				coloredSplit.add(color.toString() + line);
 			}
-			return splitMsg;
+			return coloredSplit;
 		}
 	}
 	

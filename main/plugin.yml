@@ -7,9 +7,9 @@ authors:
 commands:
     bab:
         description: Alias for buyab
-        usage: /bab [help|info|page|category|current|buy|rent|info]
+        usage: /bab [categories|category|page|current|buy|rent|info|help]
     
     buyab:
         description: Buy abilities via this command
-        usage: /buyab [help|info|page|category|current|buy|rent|info]
+        usage: /buyab [categories|category|page|current|buy|rent|info|help]
         
