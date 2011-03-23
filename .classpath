@@ -3,15 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="main"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="lib" path="C:/Users/Ryan/Desktop/RCBukkitDev/Dependencies/bukkit-0.0.1-SNAPSHOT.jar" sourcepath="C:/Users/Ryan/Desktop/RCBukkitDev/Dependencies/Bukkit-Bukkit-0.0.0-446-g9768ecc.zip"/>
-	<classpathentry kind="lib" path="C:/Users/Ryan/Desktop/RCBukkitDev/Dependencies/craftbukkit-0.0.1-SNAPSHOT.jar" sourcepath="C:/Users/Ryan/Desktop/RCBukkitDev/Dependencies/Bukkit-CraftBukkit-0.0.0-552-gf9a4b36.zip"/>
-	<classpathentry kind="lib" path="C:/Users/Ryan/Desktop/RCBukkitDev/Dependencies/Permissions 2.5.4/Permissions.jar" sourcepath="C:/Users/Ryan/Desktop/RCBukkitDev/Dependencies/Permissions 2.5.4/TheYeti-Permissions-v2.5.4-4-g38fc74c.zip"/>
-	<classpathentry kind="lib" path="C:/Users/Ryan/Desktop/RCBukkitDev/Dependencies/GroupManager 1.0 alpha-5/GroupManager.jar" sourcepath="C:/Users/Ryan/Desktop/RCBukkitDev/Dependencies/GroupManager 1.0 alpha-5/gmcouto-GroupManager-7e7ef10.zip">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/C:/Users/Ryan/Desktop/RCBukkitDev/Dependencies/GroupManager 1.0 alpha-5/JavaDoc-GroupManager-1.0-alpha-3.zip!/site/apidocs"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Ryan/Desktop/RCBukkitDev/Dependencies/iConomy 4.4.6/iConomy.jar" sourcepath="C:/Users/Ryan/Desktop/RCBukkitDev/Dependencies/iConomy 4.4.6/iConomy-Core-f60041d.zip"/>
-	<classpathentry kind="lib" path="C:/Users/Ryan/Desktop/RCBukkitDev/Dependencies/Essentials/Essentials.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/RcjrUtil"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Bukkit"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

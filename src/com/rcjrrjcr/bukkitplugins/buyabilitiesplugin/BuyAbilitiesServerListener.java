@@ -4,8 +4,8 @@ import org.bukkit.event.server.PluginEvent;
 import org.bukkit.event.server.ServerListener;
 import org.bukkit.plugin.Plugin;
 
-import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.economyinterface.EconPlugin;
-import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.permissionsinterface.PermPlugin;
+import com.rcjrrjcr.bukkitplugins.util.economyinterface.EconPlugin;
+import com.rcjrrjcr.bukkitplugins.util.permissionsinterface.PermPlugin;
 
 //import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.EconomicPlugins.EconPlugin;
 /**

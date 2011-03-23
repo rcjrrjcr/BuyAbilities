@@ -16,17 +16,19 @@ import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.java.JavaPlugin;
+//import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.scheduler.BukkitScheduler;
 
-import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.economyinterface.EconFactory;
-import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.economyinterface.EconPlugin;
-import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.economyinterface.IEconHandler;
-import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.chathelper.ChatHelper;
-import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.permissionsinterface.IPermHandler;
-import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.permissionsinterface.PermFactory;
-import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.permissionsinterface.PermPlugin;
+import com.rcjrrjcr.bukkitplugins.util.RcjrPlugin;
+import com.rcjrrjcr.bukkitplugins.util.economyinterface.EconFactory;
+import com.rcjrrjcr.bukkitplugins.util.economyinterface.EconPlugin;
+import com.rcjrrjcr.bukkitplugins.util.economyinterface.IEconHandler;
+import com.rcjrrjcr.bukkitplugins.util.chathelper.ChatHelper;
+import com.rcjrrjcr.bukkitplugins.util.permissionsinterface.IPermHandler;
+import com.rcjrrjcr.bukkitplugins.util.permissionsinterface.PermFactory;
+import com.rcjrrjcr.bukkitplugins.util.permissionsinterface.PermPlugin;
+
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.settings.Ability;
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.settings.Settings;
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.IStorage;
@@ -38,7 +40,7 @@ import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.Storage;
  * @author rcjrrjcr
  */
 //TODO: Javadoc
-public class BuyAbilities extends JavaPlugin
+public class BuyAbilities extends RcjrPlugin
 {
 	
 	private static final ChatColor COLOR_CHAT = ChatColor.GOLD;
@@ -300,7 +302,7 @@ public class BuyAbilities extends JavaPlugin
 		}
 		if(args.length == 0)
 		{
-			ChatHelper.sendMsgWrap(COLOR_CHAT,"Incorrect syntax. Syntax /bab [categories|category|page|current|buy|rent|info].",player);
+			ChatHelper.sendMsgWrap(COLOR_CHAT,"Help: /bab [categories|category|page|current|buy|rent|info].",player);
 			return true;			
 		}
 		else if(args[0].equalsIgnoreCase("categories"))
