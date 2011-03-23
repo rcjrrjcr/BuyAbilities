@@ -572,6 +572,12 @@ public class BuyAbilities extends RcjrPlugin
 		return (int) eHandler.getBalance(getServer().getPlayer(playerName));
 	}
 	
+	
+	void decrement(Player player, String name) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 //	void pluginCommand(CommandSender sender, Command command, String[] args)
 //	{
 //		

@@ -21,10 +21,14 @@ public class Settings {
 	private Configuration yamlConfig;
 	private HashMap<String,Ability> nameToAbilityMap;
 	private HashMap<String,Set<Ability>> categoryToAbilityMap;
+	private HashMap<String,Set<String>> pluginCommandMap;
+	
 	public Settings(BuyAbilities origin, String path) throws Exception
 	{
 		nameToAbilityMap = new HashMap<String,Ability>();
 		categoryToAbilityMap = new HashMap<String,Set<Ability>>();
+		pluginCommandMap = new HashMap<String,Set<String>>();
+		
 		this.origin = origin; 
 		yamlFile = new File(path);
 		if(!(yamlFile.exists()))
@@ -49,6 +53,7 @@ public class Settings {
 	
 	public void reload() throws Exception
 	{
+		//TODO: Add code to load hooked plugins and commands
 		Map<String, ConfigurationNode> abilityNodeList = yamlConfig.getNodes("Abilities");
 		for(String abilityName : abilityNodeList.keySet())
 		{
