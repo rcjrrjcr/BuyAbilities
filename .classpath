@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="main"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/RcjrUtil"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/RcjrUtil"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Bukkit"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

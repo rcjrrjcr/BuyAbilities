@@ -9,6 +9,7 @@ import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.PurchasedAbilityTyp
 
 public class AbilityManager
 {
+	//TODO: Add usage checking
 	List<PurchasedAbility> rentedAbilities;
 	HashMap<String,Set<PurchasedAbility>> currentAbilities;
 	BuyAbilities origin;

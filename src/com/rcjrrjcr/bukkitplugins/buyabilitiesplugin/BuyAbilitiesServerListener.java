@@ -15,7 +15,7 @@ import com.rcjrrjcr.bukkitplugins.util.permissionsinterface.PermPlugin;
  */
 public class BuyAbilitiesServerListener extends ServerListener {
 	
-	
+	//TODO: Add code to hook into plugins
 	private final BuyAbilities plugin;
 	private boolean permActive;
 	private boolean econActive;

@@ -574,13 +574,9 @@ public class BuyAbilities extends RcjrPlugin
 	
 	
 	void decrement(Player player, String name) {
-		// TODO Auto-generated method stub
+		//TODO: Decrement usage counter using separate thread
 		
 	}
 	
-//	void pluginCommand(CommandSender sender, Command command, String[] args)
-//	{
-//		
-//	}
 }
 
