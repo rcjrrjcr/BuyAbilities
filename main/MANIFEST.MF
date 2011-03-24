@@ -1,2 +1,2 @@
 Manifest-Version: 1.0
-Class-Path: iConomy.jar GroupManager.jar Permissions.jar EssentialsGroupManager.jar Essentials.jar ../RcjrUtil.jar
+Class-Path:

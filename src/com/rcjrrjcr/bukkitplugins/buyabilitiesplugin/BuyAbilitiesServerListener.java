@@ -4,6 +4,7 @@ import org.bukkit.event.server.PluginEvent;
 import org.bukkit.event.server.ServerListener;
 import org.bukkit.plugin.Plugin;
 
+import com.rcjrrjcr.bukkitplugins.util.PluginStruct;
 import com.rcjrrjcr.bukkitplugins.util.economyinterface.EconPlugin;
 import com.rcjrrjcr.bukkitplugins.util.permissionsinterface.PermPlugin;
 
@@ -22,8 +23,8 @@ public class BuyAbilitiesServerListener extends ServerListener {
 
 	public BuyAbilitiesServerListener(BuyAbilities instance, PluginStruct hooks) {
 		plugin = instance;
-		permActive = hooks.perm;
-		econActive = hooks.econ;
+		permActive = hooks.isPermActive();
+		econActive = hooks.isEconActive();
 	}
 	@Override
 	public void onPluginEnabled(PluginEvent event)

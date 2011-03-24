@@ -20,6 +20,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import com.rcjrrjcr.bukkitplugins.util.PluginStruct;
 import com.rcjrrjcr.bukkitplugins.util.RcjrPlugin;
 import com.rcjrrjcr.bukkitplugins.util.economyinterface.EconFactory;
 import com.rcjrrjcr.bukkitplugins.util.economyinterface.EconPlugin;
@@ -40,11 +41,13 @@ import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.Storage;
  * @author rcjrrjcr
  */
 //TODO: Javadoc
+//TODO: Write decrement()
 public class BuyAbilities extends RcjrPlugin
 {
 	
 	private static final ChatColor COLOR_CHAT = ChatColor.GOLD;
 	private BuyAbilitiesServerListener serverListener;
+	private BuyAbilitiesPlayerListener playerListener;
 	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
 	IEconHandler eHandler;
 	IStorage storage;
@@ -88,6 +91,7 @@ public class BuyAbilities extends RcjrPlugin
 			System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled!" );
 		}
 		serverListener  = new BuyAbilitiesServerListener(this,active);
+		playerListener  = new BuyAbilitiesPlayerListener();
 		
 		
 		try {
@@ -116,6 +120,7 @@ public class BuyAbilities extends RcjrPlugin
 		//Register our events
 		getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, serverListener, Priority.Monitor, this);
 		getServer().getPluginManager().registerEvent(Type.PLUGIN_DISABLE, serverListener, Priority.Monitor, this);
+		getServer().getPluginManager().registerEvent(Type.PLAYER_COMMAND_PREPROCESS, playerListener, Priority.Monitor, this);
 	}
 	 /**
 	  Bukkit-called method. Prints notification of the disabling of the plugin to console.
@@ -438,7 +443,7 @@ public class BuyAbilities extends RcjrPlugin
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"Ability not found.", player);
 				return true;
 			}
-			if(!eHandler.deduct(player, ab.costs.buy.cost))
+			if(!eHandler.deduct(player, ab.costs.buyCost))
 			{
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"Insufficient funds.", player);
 				return true;
@@ -461,7 +466,7 @@ public class BuyAbilities extends RcjrPlugin
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"Ability not found.", player);
 				return true;
 			}
-			if(!eHandler.deduct(player, ab.costs.buy.cost))
+			if(!eHandler.deduct(player, ab.costs.rentCost))
 			{
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"Insufficient funds.", player);
 				return true;
@@ -535,7 +540,7 @@ public class BuyAbilities extends RcjrPlugin
 				return;
 			}
 			System.out.println("BuyAbilities: Permissions hooked!");
-			active.perm = true;
+			active.setPerm(true);
 			if(active.getStatus()) System.out.println("BuyAbilities: BuyAbilities active.");
 		}
 		if(!active.getStatus()) System.out.println("BuyAbilities: BuyAbilities inactive.");
@@ -552,7 +557,7 @@ public class BuyAbilities extends RcjrPlugin
 				return;
 			}
 			System.out.println("BuyAbilities: Economy hooked!");
-			active.econ = true;
+			active.setEcon(true);
 			if(active.getStatus()) System.out.println("BuyAbilities: BuyAbilities active.");
 		}
 		if(!active.getStatus()) System.out.println("BuyAbilities: BuyAbilities inactive.");
@@ -570,12 +575,6 @@ public class BuyAbilities extends RcjrPlugin
 		if(playerName==null) return null;
 		if(getServer().getPlayer(playerName)==null) return null;
 		return (int) eHandler.getBalance(getServer().getPlayer(playerName));
-	}
-	
-	
-	void decrement(Player player, String name) {
-		//TODO: Decrement usage counter using separate thread
-		
 	}
 	
 }

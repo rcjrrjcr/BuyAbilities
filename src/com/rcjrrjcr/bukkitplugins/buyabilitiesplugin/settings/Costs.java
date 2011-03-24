@@ -1,42 +1,57 @@
 package com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.settings;
 
 public class Costs {
-	public Cost buy;
-	public Cost rent;
-	//public Cost use;
+	
+	public boolean canBuy;
+	public int buyCost;
+	
+	public boolean canRent;
+	public int rentCost;
+	public int rentDuration;
+	
+	public boolean canUse;
+	public int useCost;
+	public int useCount;
 
 	public Costs() {
-		buy = new Cost();
-		rent = new Cost();
-	//	use = new Cost();
+		canBuy = false;
+		canRent = false;
+		canUse = false;
 	}
 	@Override
 	public String toString()
 	{
-		String val =  "Buy: $"+buy.cost+"\nRent: $"+rent.cost;
-		if(rent.duration != 0)
+		String val = "";
+		if(canBuy)
 		{
-			val = val +" "+ rent.duration+"s";
+			val = val + "Buy: $"+buyCost+"\n";
 		}
-		if(rent.uses != 0)
+		if(canRent)
 		{
-			val = val +" "+ rent.uses+"uses";
+			val = val + "Rent: $"+rentCost +" "+ rentDuration+"s\n";;
+		}
+		if(canUse)
+		{
+			val = val + "Rent: $"+useCost +" "+ useCount+"uses";
 		}
 		return val;
 	}
 	
 	public String shortString()
 	{
-		String val =  "|B: $"+buy.cost+"| |R: $"+rent.cost;
-		if(rent.duration != 0)
+		String val = "";
+		if(canBuy)
 		{
-			val = val +" "+ rent.duration+"s";
+			val = val + "|B: $"+buyCost+"|";
 		}
-		if(rent.uses != 0)
+		if(canRent)
 		{
-			val = val +" "+ rent.uses+"uses";
+			val = val + "|R: $"+rentCost +" "+ rentDuration+"s|";;
 		}
-		val = val + "|";
+		if(canUse)
+		{
+			val = val + "|U: $"+useCost +" "+ useCount+"uses|";
+		}
 		return val;
 	}
 }

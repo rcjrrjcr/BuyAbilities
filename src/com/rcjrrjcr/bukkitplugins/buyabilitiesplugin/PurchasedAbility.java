@@ -47,7 +47,8 @@ public class PurchasedAbility implements Comparable<PurchasedAbility>
 		this.type = type;
 		duration = 0;
 		//if(type == PurchasedAbilityType.BUY) duration = 0;
-		if(type == PurchasedAbilityType.RENT)duration = a.costs.rent.duration;
+		if(type == PurchasedAbilityType.RENT) duration = a.costs.rentDuration;
+		if(type == PurchasedAbilityType.USE) duration = a.costs.useCount;
 	}
 	
 }

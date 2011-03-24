@@ -7,29 +7,6 @@ package com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage;
  */
 public enum PurchasedAbilityType {
 	RENT,
-	BUY;
-	
-	/**
-	 * Utility function used for YAML serialization
-	 * @return
-	 */
-	@Deprecated
-	public int toInt()
-	{
-		if(this == BUY)
-		{
-			return 1;
-		}
-		else if(this == RENT)
-		{
-			return 2;
-		}
-		return 0;
-	}
-	
-	public String shortString()
-	{
-		if(this == BUY) return "B";
-		return "R";
-	}
+	BUY,
+	USE;
 }

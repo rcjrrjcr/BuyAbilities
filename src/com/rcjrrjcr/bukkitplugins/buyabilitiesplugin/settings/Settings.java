@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,14 +22,13 @@ public class Settings {
 	private Configuration yamlConfig;
 	private HashMap<String,Ability> nameToAbilityMap;
 	private HashMap<String,Set<Ability>> categoryToAbilityMap;
-	private HashMap<String,Set<String>> pluginCommandMap;
+	private HashMap<String,Set<Ability>> commandRegex;
 	
 	public Settings(BuyAbilities origin, String path) throws Exception
 	{
 		nameToAbilityMap = new HashMap<String,Ability>();
 		categoryToAbilityMap = new HashMap<String,Set<Ability>>();
-		pluginCommandMap = new HashMap<String,Set<String>>();
-		
+		commandRegex = new HashMap<String,Set<Ability>>();
 		this.origin = origin; 
 		yamlFile = new File(path);
 		if(!(yamlFile.exists()))
@@ -53,33 +53,52 @@ public class Settings {
 	
 	public void reload() throws Exception
 	{
-		//TODO: Add code to load hooked plugins and commands
+		//TODO: Add code to load hooked commands
+		nameToAbilityMap.clear();
+		categoryToAbilityMap.clear();
+		commandRegex.clear();
 		Map<String, ConfigurationNode> abilityNodeList = yamlConfig.getNodes("Abilities");
 		for(String abilityName : abilityNodeList.keySet())
 		{
-//			System.out.println(abilityName);
 			Ability ab = new Ability();
 			ab.name = abilityName;
-//			System.out.println(yamlConfig.getString("Abilities."+abilityName+".info.name"));
-			ab.info.extName = yamlConfig.getString("Abilities."+abilityName+".info.name");
-			ab.info.desc = yamlConfig.getString("Abilities."+abilityName+".info.description");
-			ab.info.help = yamlConfig.getString("Abilities."+abilityName+".info.help");
+			ab.info.extName = yamlConfig.getString("Abilities."+abilityName+".info.name","Default Ability Name");
+			ab.info.desc = yamlConfig.getString("Abilities."+abilityName+".info.description","Default Ability Description");
+			ab.info.help = yamlConfig.getString("Abilities."+abilityName+".info.help","Default Ability HelpText");
 			ab.perms.addAll(yamlConfig.getStringList("Abilities."+abilityName+".permissions", new ArrayList<String>()));
 			ab.categories = yamlConfig.getStringList("Abilities."+abilityName+".categories", new ArrayList<String>());
-			ab.costs.buy.set(yamlConfig.getInt("Abilities."+abilityName+"costs.buy.cost", 0),0,0);
-			ab.costs.rent.set(yamlConfig.getInt("Abilities."+abilityName+"costs.rent.cost", 0),yamlConfig.getInt("Abilities."+abilityName+"costs.rent.duration", 0),yamlConfig.getInt("Abilities."+abilityName+"costs.rent.uses", 0));
-//			ab.costs.use.set(yamlConfig.getInt("Abilities."+abilityName+"costs.use.cost", 0),0,yamlConfig.getInt("Abilities."+abilityName+"costs.buy.stock", 0));
-//			System.out.println(ab.name != null);
+			if((yamlConfig.getNode("Abilities."+abilityName+"costs.buy")!=null)&&(yamlConfig.getInt("Abilities."+abilityName+"costs.buy.cost", 0)!=0))
+			{
+				ab.costs.canBuy = true;
+				ab.costs.buyCost = yamlConfig.getInt("Abilities."+abilityName+"costs.buy.cost", 0);
+			}
+			if(yamlConfig.getNode("Abilities."+abilityName+"costs.rent")!=null&&(yamlConfig.getInt("Abilities."+abilityName+"costs.rent.duration", 0)>0))
+			{
+				ab.costs.canRent = true;
+				ab.costs.rentCost = yamlConfig.getInt("Abilities."+abilityName+"costs.rent.cost", 0);
+				ab.costs.rentDuration = yamlConfig.getInt("Abilities."+abilityName+"costs.rent.duration", 0);
+			}
+			if(yamlConfig.getNode("Abilities."+abilityName+"costs.use")!=null&&(yamlConfig.getInt("Abilities."+abilityName+"costs.use.usecount", 0)>0)&&(yamlConfig.getStringList("Abilities."+abilityName+"commands",null)!=null)&&(!yamlConfig.getStringList("Abilities."+abilityName+"commands",null).isEmpty()))
+			{
+				ab.costs.canUse = true;
+				ab.costs.useCost = yamlConfig.getInt("Abilities."+abilityName+"costs.use.cost", 0);
+				ab.costs.useCount = yamlConfig.getInt("Abilities."+abilityName+"costs.use.usecount", 0);
+			}
+			List<String> rgxList = yamlConfig.getStringList("Abilities."+abilityName+"commands",new LinkedList<String>());
+			ab.commands = rgxList;
+			for(String regex : rgxList)
+			{
+				if(!commandRegex.containsKey(regex)) commandRegex.put(regex, new HashSet<Ability>());
+				commandRegex.get(regex).add(ab);
+			}
+			
 			nameToAbilityMap.put(ab.name, ab);
-//			System.out.println(abilityNameToAbilityMap.toString());
-//			System.out.println(ab.categories.size());
 			for(String category : ab.categories)
 			{
 				if(!categoryToAbilityMap.containsKey(category)) categoryToAbilityMap.put(category, new HashSet<Ability>());
 				categoryToAbilityMap.get(category).add(ab);
 			}
 		}
-		
 	}
 	
 	
@@ -102,13 +121,11 @@ public class Settings {
 	public List<String> getCategories(String world, Player player)
 	{
 		List<String> categoryList = new ArrayList<String>();
-		//System.out.println(categoryList.size());
 		for(String category : categoryToAbilityMap.keySet())
 		{
 			if(origin.hasPermission(world, player.getName(), "buyabilities.abilities."+category.replace(' ', '.')))
 			{
 				categoryList.add(category);
-				//System.out.println(category);
 			}
 		}
 		return categoryList;

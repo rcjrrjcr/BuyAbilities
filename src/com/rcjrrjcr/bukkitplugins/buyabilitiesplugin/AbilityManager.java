@@ -11,6 +11,7 @@ public class AbilityManager
 {
 	//TODO: Add usage checking
 	List<PurchasedAbility> rentedAbilities;
+	List<PurchasedAbility> useCountAbilities;
 	HashMap<String,Set<PurchasedAbility>> currentAbilities;
 	BuyAbilities origin;
 	
@@ -62,6 +63,7 @@ public class AbilityManager
 			}
 		}
 		if(p.type == PurchasedAbilityType.RENT) rentedAbilities.add(p);
+		if(p.type == PurchasedAbilityType.USE) useCountAbilities.add(p);
 		if(currentAbilities.get(p.playerName) == null) currentAbilities.put(p.playerName, new HashSet<PurchasedAbility>());
 		currentAbilities.get(p.playerName).add(p);
 	}
@@ -79,6 +81,11 @@ public class AbilityManager
 	public synchronized void buyAbility(String worldName, String playerName, String abilityName)
 	{
 		PurchasedAbility p = new PurchasedAbility(origin.settings.getAbility(abilityName),playerName, worldName, PurchasedAbilityType.BUY);
+		addPlayerAbility(p);
+	}
+	public synchronized void useCountAbility(String worldName, String playerName, String abilityName)
+	{
+		PurchasedAbility p = new PurchasedAbility(origin.settings.getAbility(abilityName),playerName, worldName, PurchasedAbilityType.USE);
 		addPlayerAbility(p);
 	}
 	public synchronized void removePlayerAbility(String worldName, String playerName, String abilityName)
@@ -101,6 +108,7 @@ public class AbilityManager
 			}
 		}
 		if(p.type == PurchasedAbilityType.RENT) rentedAbilities.remove(p);
+		if(p.type == PurchasedAbilityType.USE) useCountAbilities.remove(p);
 		currentAbilities.get(p.playerName).remove(p);
 	}
 	
@@ -137,6 +145,15 @@ public class AbilityManager
 			{
 				currentAbilities.get(p.playerName).remove(p);
 				rentedAbilities.remove(p);
+			}
+		}
+		for(PurchasedAbility u : useCountAbilities)
+		{
+			if(origin.getServer().getPlayer(u.playerName)==null||!origin.getServer().getPlayer(u.playerName).isOnline()) continue;
+			if(u.duration < 0)
+			{
+				currentAbilities.get(u.playerName).remove(u);
+				rentedAbilities.remove(u);
 			}
 		}
 	}
