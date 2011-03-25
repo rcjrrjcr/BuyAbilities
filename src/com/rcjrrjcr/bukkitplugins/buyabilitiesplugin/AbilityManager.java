@@ -9,7 +9,6 @@ import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.PurchasedAbilityTyp
 
 public class AbilityManager
 {
-	//TODO: Add usage checking
 	List<PurchasedAbility> rentedAbilities;
 	List<PurchasedAbility> useCountAbilities;
 	HashMap<String,Set<PurchasedAbility>> currentAbilities;
@@ -134,7 +133,13 @@ public class AbilityManager
 		}
 		return abList;
 	}
-	
+	public synchronized void decrement(String worldName, String playerName, String abilityName)
+	{
+		PurchasedAbility p = getPlayerAbility(worldName,playerName,abilityName);
+		if(p==null) return;
+		p.duration--;
+		return;
+	}
 	synchronized void update(final int interval)
 	{
 		for(PurchasedAbility p : rentedAbilities)

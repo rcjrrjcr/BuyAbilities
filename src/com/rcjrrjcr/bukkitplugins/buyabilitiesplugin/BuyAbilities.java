@@ -3,6 +3,7 @@ package com.rcjrrjcr.bukkitplugins.buyabilitiesplugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -91,7 +92,7 @@ public class BuyAbilities extends RcjrPlugin
 			System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled!" );
 		}
 		serverListener  = new BuyAbilitiesServerListener(this,active);
-		playerListener  = new BuyAbilitiesPlayerListener();
+		playerListener  = new BuyAbilitiesPlayerListener(this);
 		
 		
 		try {
@@ -307,7 +308,7 @@ public class BuyAbilities extends RcjrPlugin
 		}
 		if(args.length == 0)
 		{
-			ChatHelper.sendMsgWrap(COLOR_CHAT,"Help: /bab [categories|category|page|current|buy|rent|info].",player);
+			ChatHelper.sendMsgWrap(COLOR_CHAT,"Help: /bab [categories|category|page|current|buy|rent|rentuse|info].",player);
 			return true;			
 		}
 		else if(args[0].equalsIgnoreCase("categories"))
@@ -443,6 +444,11 @@ public class BuyAbilities extends RcjrPlugin
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"Ability not found.", player);
 				return true;
 			}
+			if(abManager.hasPlayerAbility(player.getWorld().getName(), player.getName(), abilityName))
+			{
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"You already have this ability.", player);
+				return true;	
+			}
 			if(!eHandler.deduct(player, ab.costs.buyCost))
 			{
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"Insufficient funds.", player);
@@ -466,12 +472,45 @@ public class BuyAbilities extends RcjrPlugin
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"Ability not found.", player);
 				return true;
 			}
+			if(abManager.hasPlayerAbility(player.getWorld().getName(), player.getName(), abilityName))
+			{
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"You already have this ability.", player);
+				return true;	
+			}
 			if(!eHandler.deduct(player, ab.costs.rentCost))
 			{
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"Insufficient funds.", player);
 				return true;
 			}
 			abManager.rentAbility(player.getWorld().getName(), player.getName(), abilityName);
+			ChatHelper.sendMsgWrap(COLOR_CHAT,"Ability rented.", player);
+			return true;
+		}
+		else if(args[0].equalsIgnoreCase("rentuse"))
+		{
+			if(args.length != 2)
+			{
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Incorrect syntax. Syntax /bab rentuse <abilityname>", player);
+				return true;
+			}
+			String abilityName = args[1];
+			Ability ab = settings.getAbility(abilityName);
+			if(ab==null)
+			{
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Ability not found.", player);
+				return true;
+			}
+			if(abManager.hasPlayerAbility(player.getWorld().getName(), player.getName(), abilityName))
+			{
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"You already have this ability.", player);
+				return true;	
+			}
+			if(!eHandler.deduct(player, ab.costs.rentCost))
+			{
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Insufficient funds.", player);
+				return true;
+			}
+			abManager.useCountAbility(player.getWorld().getName(), player.getName(), abilityName);
 			ChatHelper.sendMsgWrap(COLOR_CHAT,"Ability rented.", player);
 			return true;
 		}
@@ -577,5 +616,23 @@ public class BuyAbilities extends RcjrPlugin
 		return (int) eHandler.getBalance(getServer().getPlayer(playerName));
 	}
 	
+	void commandPreprocess(String cmdLine, String playerName, String worldName)
+	{
+		//TODO: Write command regex checking
+		Set<String> rgxs= settings.getAllCmds();
+		Set<Ability> abSet = new HashSet<Ability>();
+		for(String rgx : rgxs)
+		{
+			if(cmdLine.matches(rgx))
+			{
+				abSet.addAll(settings.getCmdAbility(rgx));
+			}
+		}
+		for(Ability ab : abSet)
+		{
+			abManager.decrement(worldName, playerName, ab.name);
+		}
+		
+	}
 }
 

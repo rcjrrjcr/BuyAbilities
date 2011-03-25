@@ -182,6 +182,17 @@ public class Settings {
 		categories = null;
 		return abList;
 	}
+	
+	public Set<String> getAllCmds()
+	{
+		return commandRegex.keySet();
+	}
+	public Set<Ability> getCmdAbility(String cmd)
+	{
+		Set<Ability> abSet = commandRegex.get(cmd);
+		if(abSet==null) return new HashSet<Ability>();
+		return abSet;
+	}
 }
 
 
