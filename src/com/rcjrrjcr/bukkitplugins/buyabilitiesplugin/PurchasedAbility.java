@@ -25,7 +25,10 @@ public class PurchasedAbility implements Comparable<PurchasedAbility>
 	@Override
 	public String toString()
 	{
-		return abilityName + ": " + extName+" with "+ new Integer(duration/20).toString() +"s left in world " + world +".";
+		if(type== PurchasedAbilityType.RENT) return abilityName + ": " + extName+" with "+ new Integer(duration/20).toString() +"s left in world " + world +".";
+		if(type== PurchasedAbilityType.BUY) return abilityName + ": " + extName+" in world " + world +".";
+		if(type== PurchasedAbilityType.USE) return abilityName + ": " + extName+" with "+ duration +" uses left in world " + world +".";
+		return "Error: " + abilityName + "type not specified.";
 	}
 	public PurchasedAbility()
 	{

@@ -84,7 +84,8 @@ public class Settings {
 				ab.costs.useCost = yamlConfig.getInt("Abilities."+abilityName+"costs.use.cost", 0);
 				ab.costs.useCount = yamlConfig.getInt("Abilities."+abilityName+"costs.use.usecount", 0);
 			}
-			List<String> rgxList = yamlConfig.getStringList("Abilities."+abilityName+"commands",new LinkedList<String>());
+			List<String> rgxList = yamlConfig.getStringList("Abilities."+abilityName+".commands",new LinkedList<String>());
+//			System.out.println(rgxList);
 			ab.commands = rgxList;
 			for(String regex : rgxList)
 			{
@@ -99,6 +100,8 @@ public class Settings {
 				categoryToAbilityMap.get(category).add(ab);
 			}
 		}
+		
+//		System.out.println(commandRegex);
 	}
 	
 	

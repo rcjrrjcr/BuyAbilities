@@ -13,6 +13,8 @@ public class BuyAbilitiesPlayerListener extends PlayerListener {
 	}
 
     public void onPlayerCommandPreprocess(PlayerChatEvent event) {
+//    	System.out.println("PlayerCommandPreprocess event detected!");
+//    	System.out.println(event.getMessage());
     	origin.getServer().getScheduler().scheduleAsyncDelayedTask(origin, new Decrementer(origin, event));
     	return;
     }
@@ -30,6 +32,7 @@ class Decrementer implements Runnable
 	}
 	@Override
 	public void run() {
+//    	System.out.println("Decrementing!");
     	origin.commandPreprocess(event.getMessage(),event.getPlayer().getName(),event.getPlayer().getWorld().getName());
 	}
 }

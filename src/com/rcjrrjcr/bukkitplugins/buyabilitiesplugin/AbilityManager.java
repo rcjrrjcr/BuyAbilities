@@ -17,6 +17,7 @@ public class AbilityManager
 	public AbilityManager(BuyAbilities origin)
 	{
 		rentedAbilities = new LinkedList<PurchasedAbility>();
+		useCountAbilities = new LinkedList<PurchasedAbility>();
 		currentAbilities = new HashMap<String, Set<PurchasedAbility> >();
 		this.origin = origin;
 		return;
@@ -33,7 +34,7 @@ public class AbilityManager
 		Set<PurchasedAbility> playerCurrent = getPlayer(playerName);
 		for(PurchasedAbility p : playerCurrent)
 		{
-			if(p.abilityName==abilityName&&p.world==worldName)
+			if(p.abilityName.equalsIgnoreCase(abilityName)&&p.world.equalsIgnoreCase(worldName))
 			{
 				return p;
 			}
@@ -135,8 +136,10 @@ public class AbilityManager
 	}
 	public synchronized void decrement(String worldName, String playerName, String abilityName)
 	{
+		System.out.println("World: "+ worldName+" Player: "+playerName+" Ability: "+abilityName);
 		PurchasedAbility p = getPlayerAbility(worldName,playerName,abilityName);
 		if(p==null) return;
+		System.out.println(p);
 		p.duration--;
 		return;
 	}
@@ -155,7 +158,7 @@ public class AbilityManager
 		for(PurchasedAbility u : useCountAbilities)
 		{
 			if(origin.getServer().getPlayer(u.playerName)==null||!origin.getServer().getPlayer(u.playerName).isOnline()) continue;
-			if(u.duration < 0)
+			if(u.duration <= 0)
 			{
 				currentAbilities.get(u.playerName).remove(u);
 				rentedAbilities.remove(u);

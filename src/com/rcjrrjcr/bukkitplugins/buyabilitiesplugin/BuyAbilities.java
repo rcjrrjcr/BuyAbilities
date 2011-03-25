@@ -618,18 +618,23 @@ public class BuyAbilities extends RcjrPlugin
 	
 	void commandPreprocess(String cmdLine, String playerName, String worldName)
 	{
-		//TODO: Write command regex checking
+//    	System.out.println("commandPreprocess called!");
 		Set<String> rgxs= settings.getAllCmds();
+//		System.out.println(rgxs.toString());
 		Set<Ability> abSet = new HashSet<Ability>();
 		for(String rgx : rgxs)
 		{
+//			System.out.println("Checking: "+rgx);
 			if(cmdLine.matches(rgx))
 			{
+//				System.out.println("Matched!");
 				abSet.addAll(settings.getCmdAbility(rgx));
 			}
 		}
+//		System.out.println(abSet);
 		for(Ability ab : abSet)
 		{
+//			System.out.println("World: "+ worldName+"Player: "+playerName+"Ability: "+ab.name);
 			abManager.decrement(worldName, playerName, ab.name);
 		}
 		
