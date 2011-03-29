@@ -23,6 +23,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 import com.rcjrrjcr.bukkitplugins.util.PluginStruct;
 import com.rcjrrjcr.bukkitplugins.util.RcjrPlugin;
+import com.rcjrrjcr.bukkitplugins.util.SearchHelper;
 import com.rcjrrjcr.bukkitplugins.util.economyinterface.EconFactory;
 import com.rcjrrjcr.bukkitplugins.util.economyinterface.EconPlugin;
 import com.rcjrrjcr.bukkitplugins.util.economyinterface.IEconHandler;
@@ -63,7 +64,7 @@ public class BuyAbilities extends RcjrPlugin
 	BuyAbilitiesChecker checker;
 	private final Integer checkDelay = 5;
 	private final Integer checkInterval = 10;
-	public PluginStruct active;
+//	public PluginStruct active;
 	/**
 	 Bukkit-called method. Creates appropriate instances of economy, permissions and storage plugins. Also starts thread to check for permission expiry.
 	 
@@ -296,6 +297,22 @@ public class BuyAbilities extends RcjrPlugin
 	    			ChatHelper.sendMsgWrap(cmd, sender);
 	    			return true;
 	    		}
+	    		if(args[0].equalsIgnoreCase("dldist"))
+	    		{
+	    			if(args.length != 3)
+	    			{
+		    			ChatHelper.sendMsgWrap("Incorrect syntax. Syntax /bab dldist <word1> <word2>", sender);
+		    			return true;
+	    			}
+	    			ChatHelper.sendMsgWrap(String.valueOf(SearchHelper.damlev(args[1], args[2])), sender);
+	    			return true;
+	    		}
+	    		if(args[0].equalsIgnoreCase("status"))
+	    		{
+	    			System.out.println("Econ hooked: "+String.valueOf(active.isEconActive()));
+	    			System.out.println("Perm hooked: "+String.valueOf(active.isPermActive()));
+	    			return true;
+	    		}
 	    	}
 	    }
 	    return false;
@@ -305,12 +322,12 @@ public class BuyAbilities extends RcjrPlugin
 	{
 		if(!pHandler.hasPerm(player.getWorld().getName(), player.getName(), "buyabilities.use")) 
 		{
-			ChatHelper.sendMsgWrap(COLOR_CHAT,"You do not have permissions to use this command.",player);
+			ChatHelper.sendMsgWrap(COLOR_CHAT,"You do not have permission to use this command.",player);
 			return true;		
 		}
 		if(args.length == 0)
 		{
-			ChatHelper.sendMsgWrap(COLOR_CHAT,"Help: /bab [categories|category|page|current|buy|rent|rentuse|info].",player);
+			ChatHelper.sendMsgWrap(COLOR_CHAT,"Help: /bab [categories|category|page|current|buy|rent|retuse|info].",player);
 			return true;			
 		}
 		else if(args[0].equalsIgnoreCase("categories"))
@@ -364,7 +381,8 @@ public class BuyAbilities extends RcjrPlugin
 				List<String> categoryMisses = settings.getCategoryMisses(args[1], DL_THRESHOLD);
 				if(categoryMisses.isEmpty()) return true;
 				ChatHelper.sendMsgWrap(COLOR_CHAT, "Did you mean any of these?", player);
-				for(int i = 0; i < MISS_COUNT_THRESHOLD; i++)
+				int max = Math.min(MISS_COUNT_THRESHOLD, categoryMisses.size());
+				for(int i = 0; i < max; i++)
 				{
 					ChatHelper.sendMsgWrap(COLOR_CHAT, categoryMisses.get(i), player);
 				}
@@ -454,7 +472,8 @@ public class BuyAbilities extends RcjrPlugin
 				List<String> abilityMisses = settings.getAbilityMisses(args[1], DL_THRESHOLD);
 				if(abilityMisses.isEmpty()) return true;
 				ChatHelper.sendMsgWrap(COLOR_CHAT, "Did you mean any of these?", player);
-				for(int i = 0; i < MISS_COUNT_THRESHOLD; i++)
+				int max = Math.min(MISS_COUNT_THRESHOLD, abilityMisses.size());
+				for(int i = 0; i < max; i++)
 				{
 					ChatHelper.sendMsgWrap(COLOR_CHAT, abilityMisses.get(i), player);
 				}
@@ -489,7 +508,8 @@ public class BuyAbilities extends RcjrPlugin
 				List<String> abilityMisses = settings.getAbilityMisses(args[1], DL_THRESHOLD);
 				if(abilityMisses.isEmpty()) return true;
 				ChatHelper.sendMsgWrap(COLOR_CHAT, "Did you mean any of these?", player);
-				for(int i = 0; i < MISS_COUNT_THRESHOLD; i++)
+				int max = Math.min(MISS_COUNT_THRESHOLD, abilityMisses.size());
+				for(int i = 0; i < max; i++)
 				{
 					ChatHelper.sendMsgWrap(COLOR_CHAT, abilityMisses.get(i), player);
 				}
@@ -524,7 +544,8 @@ public class BuyAbilities extends RcjrPlugin
 				List<String> abilityMisses = settings.getAbilityMisses(args[1], DL_THRESHOLD);
 				if(abilityMisses.isEmpty()) return true;
 				ChatHelper.sendMsgWrap(COLOR_CHAT, "Did you mean any of these?", player);
-				for(int i = 0; i < MISS_COUNT_THRESHOLD; i++)
+				int max = Math.min(MISS_COUNT_THRESHOLD, abilityMisses.size());
+				for(int i = 0; i < max; i++)
 				{
 					ChatHelper.sendMsgWrap(COLOR_CHAT, abilityMisses.get(i), player);
 				}
@@ -559,7 +580,8 @@ public class BuyAbilities extends RcjrPlugin
 				List<String> abilityMisses = settings.getAbilityMisses(args[1], DL_THRESHOLD);
 				if(abilityMisses.isEmpty()) return true;
 				ChatHelper.sendMsgWrap(COLOR_CHAT, "Did you mean any of these?", player);
-				for(int i = 0; i < 5; i++)
+				int max = Math.min(MISS_COUNT_THRESHOLD, abilityMisses.size());
+				for(int i = 0; i < max; i++)
 				{
 					ChatHelper.sendMsgWrap(COLOR_CHAT, abilityMisses.get(i), player);
 				}
@@ -592,7 +614,8 @@ public class BuyAbilities extends RcjrPlugin
 				List<String> abilityMisses = settings.getAbilityMisses(args[1], DL_THRESHOLD);
 				if(abilityMisses.isEmpty()) return true;
 				ChatHelper.sendMsgWrap(COLOR_CHAT, "Did you mean any of these?", player);
-				for(int i = 0; i < 5; i++)
+				int max = Math.min(MISS_COUNT_THRESHOLD, abilityMisses.size());
+				for(int i = 0; i < max; i++)
 				{
 					ChatHelper.sendMsgWrap(COLOR_CHAT, abilityMisses.get(i), player);
 				}

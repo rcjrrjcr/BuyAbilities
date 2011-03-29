@@ -136,10 +136,10 @@ public class AbilityManager
 	}
 	public synchronized void decrement(String worldName, String playerName, String abilityName)
 	{
-		System.out.println("World: "+ worldName+" Player: "+playerName+" Ability: "+abilityName);
+//		System.out.println("World: "+ worldName+" Player: "+playerName+" Ability: "+abilityName);
 		PurchasedAbility p = getPlayerAbility(worldName,playerName,abilityName);
 		if(p==null) return;
-		System.out.println(p);
+//		System.out.println(p);
 		p.duration--;
 		return;
 	}
