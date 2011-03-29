@@ -14,18 +14,24 @@ import org.bukkit.util.config.Configuration;
 import org.bukkit.util.config.ConfigurationNode;
 
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.BuyAbilities;
+import com.rcjrrjcr.bukkitplugins.util.SearchHelper;
 
+//TODO: Add SearchHelper for categories and abilities
 
 public class Settings {
 	private BuyAbilities origin;
-	private File yamlFile;
+	private File yamlFile; 
 	private Configuration yamlConfig;
 	private HashMap<String,Ability> nameToAbilityMap;
 	private HashMap<String,Set<Ability>> categoryToAbilityMap;
 	private HashMap<String,Set<Ability>> commandRegex;
+	private SearchHelper abilitySearch;
+	private SearchHelper categorySearch;
 	
 	public Settings(BuyAbilities origin, String path) throws Exception
 	{
+		abilitySearch = new SearchHelper();
+		categorySearch = new SearchHelper();
 		nameToAbilityMap = new HashMap<String,Ability>();
 		categoryToAbilityMap = new HashMap<String,Set<Ability>>();
 		commandRegex = new HashMap<String,Set<Ability>>();
@@ -57,6 +63,8 @@ public class Settings {
 		nameToAbilityMap.clear();
 		categoryToAbilityMap.clear();
 		commandRegex.clear();
+		abilitySearch.clear();
+		categorySearch.clear();
 		Map<String, ConfigurationNode> abilityNodeList = yamlConfig.getNodes("Abilities");
 		for(String abilityName : abilityNodeList.keySet())
 		{
@@ -98,7 +106,9 @@ public class Settings {
 			{
 				if(!categoryToAbilityMap.containsKey(category)) categoryToAbilityMap.put(category, new HashSet<Ability>());
 				categoryToAbilityMap.get(category).add(ab);
+				categorySearch.addWord(category);
 			}
+			abilitySearch.addWord(abilityName);
 		}
 		
 //		System.out.println(commandRegex);
@@ -195,6 +205,15 @@ public class Settings {
 		Set<Ability> abSet = commandRegex.get(cmd);
 		if(abSet==null) return new HashSet<Ability>();
 		return abSet;
+	}
+	
+	public List<String> getAbilityMisses(String abilityName, final int threshold)
+	{
+		return abilitySearch.getMisses(abilityName, threshold);
+	}
+	public List<String> getCategoryMisses(String categoryName, final int threshold)
+	{
+		return categorySearch.getMisses(categoryName, threshold);
 	}
 }
 

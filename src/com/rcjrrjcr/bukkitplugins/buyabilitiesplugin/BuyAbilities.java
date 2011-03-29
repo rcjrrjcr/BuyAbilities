@@ -46,6 +46,8 @@ import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.Storage;
 public class BuyAbilities extends RcjrPlugin
 {
 	
+	private static final int MISS_COUNT_THRESHOLD = 5;
+	private static final int DL_THRESHOLD = 5;
 	private static final ChatColor COLOR_CHAT = ChatColor.GOLD;
 	private BuyAbilitiesServerListener serverListener;
 	private BuyAbilitiesPlayerListener playerListener;
@@ -359,6 +361,13 @@ public class BuyAbilities extends RcjrPlugin
 			if(abList==null||abList.isEmpty())
 			{
 				ChatHelper.sendMsgWrap(COLOR_CHAT, "No abilities found in that category.", player);
+				List<String> categoryMisses = settings.getCategoryMisses(args[1], DL_THRESHOLD);
+				if(categoryMisses.isEmpty()) return true;
+				ChatHelper.sendMsgWrap(COLOR_CHAT, "Did you mean any of these?", player);
+				for(int i = 0; i < MISS_COUNT_THRESHOLD; i++)
+				{
+					ChatHelper.sendMsgWrap(COLOR_CHAT, categoryMisses.get(i), player);
+				}
 				return true;
 			}
 //			for(String ab : abList)
@@ -442,6 +451,13 @@ public class BuyAbilities extends RcjrPlugin
 			if(ab==null)
 			{
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"Ability not found.", player);
+				List<String> abilityMisses = settings.getAbilityMisses(args[1], DL_THRESHOLD);
+				if(abilityMisses.isEmpty()) return true;
+				ChatHelper.sendMsgWrap(COLOR_CHAT, "Did you mean any of these?", player);
+				for(int i = 0; i < MISS_COUNT_THRESHOLD; i++)
+				{
+					ChatHelper.sendMsgWrap(COLOR_CHAT, abilityMisses.get(i), player);
+				}
 				return true;
 			}
 			if(abManager.hasPlayerAbility(player.getWorld().getName(), player.getName(), abilityName))
@@ -470,6 +486,13 @@ public class BuyAbilities extends RcjrPlugin
 			if(ab==null)
 			{
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"Ability not found.", player);
+				List<String> abilityMisses = settings.getAbilityMisses(args[1], DL_THRESHOLD);
+				if(abilityMisses.isEmpty()) return true;
+				ChatHelper.sendMsgWrap(COLOR_CHAT, "Did you mean any of these?", player);
+				for(int i = 0; i < MISS_COUNT_THRESHOLD; i++)
+				{
+					ChatHelper.sendMsgWrap(COLOR_CHAT, abilityMisses.get(i), player);
+				}
 				return true;
 			}
 			if(abManager.hasPlayerAbility(player.getWorld().getName(), player.getName(), abilityName))
@@ -498,6 +521,13 @@ public class BuyAbilities extends RcjrPlugin
 			if(ab==null)
 			{
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"Ability not found.", player);
+				List<String> abilityMisses = settings.getAbilityMisses(args[1], DL_THRESHOLD);
+				if(abilityMisses.isEmpty()) return true;
+				ChatHelper.sendMsgWrap(COLOR_CHAT, "Did you mean any of these?", player);
+				for(int i = 0; i < MISS_COUNT_THRESHOLD; i++)
+				{
+					ChatHelper.sendMsgWrap(COLOR_CHAT, abilityMisses.get(i), player);
+				}
 				return true;
 			}
 			if(abManager.hasPlayerAbility(player.getWorld().getName(), player.getName(), abilityName))
@@ -526,6 +556,13 @@ public class BuyAbilities extends RcjrPlugin
 			if(ab==null)
 			{
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"Ability not found.", player);
+				List<String> abilityMisses = settings.getAbilityMisses(args[1], DL_THRESHOLD);
+				if(abilityMisses.isEmpty()) return true;
+				ChatHelper.sendMsgWrap(COLOR_CHAT, "Did you mean any of these?", player);
+				for(int i = 0; i < 5; i++)
+				{
+					ChatHelper.sendMsgWrap(COLOR_CHAT, abilityMisses.get(i), player);
+				}
 				return true;
 			}
 			String catString = "";
@@ -552,6 +589,13 @@ public class BuyAbilities extends RcjrPlugin
 			if(ab==null)
 			{
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"Ability not found.", player);
+				List<String> abilityMisses = settings.getAbilityMisses(args[1], DL_THRESHOLD);
+				if(abilityMisses.isEmpty()) return true;
+				ChatHelper.sendMsgWrap(COLOR_CHAT, "Did you mean any of these?", player);
+				for(int i = 0; i < 5; i++)
+				{
+					ChatHelper.sendMsgWrap(COLOR_CHAT, abilityMisses.get(i), player);
+				}
 				return true;
 			}
 			ChatHelper.sendMsgWrap(COLOR_CHAT,ab.info.help, player);
