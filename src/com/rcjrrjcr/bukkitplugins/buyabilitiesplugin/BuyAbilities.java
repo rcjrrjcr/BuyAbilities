@@ -332,9 +332,9 @@ public class BuyAbilities extends RcjrPlugin
 		}
 		else if(args[0].equalsIgnoreCase("categories"))
 		{
-			if(args.length > 2)
+			if(args.length > 1)
 			{
-				ChatHelper.sendMsgWrap(COLOR_CHAT,"Incorrect syntax. Syntax /bab categories <pageno>", player);
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Incorrect syntax. Syntax /bab categories", player);
 				return true;
 			}
 			String msg = "BuyAbilities: Category list: ";
@@ -373,6 +373,11 @@ public class BuyAbilities extends RcjrPlugin
 				{
 					pageNo = 1;
 				}
+			}
+			if(!settings.canAccess(args[1], player.getWorld().getName(), player))
+			{
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Unable to access category.", player);
+				return true;
 			}
 			List<String> abList = settings.getAbilites(args[1]);
 			if(abList==null||abList.isEmpty())
@@ -484,6 +489,11 @@ public class BuyAbilities extends RcjrPlugin
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"You already have this ability.", player);
 				return true;	
 			}
+			if(!ab.costs.canBuy)
+			{
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Unable to buy this ability.", player);
+				return true;
+			}
 			if(!eHandler.deduct(player, ab.costs.buyCost))
 			{
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"Insufficient funds.", player);
@@ -520,6 +530,11 @@ public class BuyAbilities extends RcjrPlugin
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"You already have this ability.", player);
 				return true;	
 			}
+			if(!ab.costs.canRent)
+			{
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Unable to rent this ability.", player);
+				return true;
+			}
 			if(!eHandler.deduct(player, ab.costs.rentCost))
 			{
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"Insufficient funds.", player);
@@ -555,6 +570,11 @@ public class BuyAbilities extends RcjrPlugin
 			{
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"You already have this ability.", player);
 				return true;	
+			}
+			if(!ab.costs.canUse)
+			{
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"Unable to buy uses of this ability.", player);
+				return true;
 			}
 			if(!eHandler.deduct(player, ab.costs.rentCost))
 			{

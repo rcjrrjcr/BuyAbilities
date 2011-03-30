@@ -136,7 +136,7 @@ public class Settings {
 		List<String> categoryList = new ArrayList<String>();
 		for(String category : categoryToAbilityMap.keySet())
 		{
-			if(origin.hasPermission(world, player.getName(), "buyabilities.abilities."+category.replace(' ', '.')))
+			if(origin.hasPermission(world, player.getName(), "buyabilities.abilities."+category.replace(' ', '.').toLowerCase()))
 			{
 				categoryList.add(category);
 			}

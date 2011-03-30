@@ -1,6 +1,6 @@
 package com.rcjrrjcr.bukkitplugins.buyabilitiesplugin;
 
-import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerListener;
 
 public class BuyAbilitiesPlayerListener extends PlayerListener {
@@ -12,7 +12,7 @@ public class BuyAbilitiesPlayerListener extends PlayerListener {
 		this.origin = origin;
 	}
 
-    public void onPlayerCommandPreprocess(PlayerChatEvent event) {
+    public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
 //    	System.out.println("PlayerCommandPreprocess event detected!");
 //    	System.out.println(event.getMessage());
     	origin.getServer().getScheduler().scheduleAsyncDelayedTask(origin, new Decrementer(origin, event));
@@ -23,9 +23,9 @@ public class BuyAbilitiesPlayerListener extends PlayerListener {
 class Decrementer implements Runnable
 {
 	private final BuyAbilities origin;
-	private final PlayerChatEvent event;
+	private final PlayerCommandPreprocessEvent event;
 	
-	public Decrementer(BuyAbilities origin, PlayerChatEvent event)
+	public Decrementer(BuyAbilities origin, PlayerCommandPreprocessEvent event)
 	{
 		this.origin = origin;
 		this.event = event;

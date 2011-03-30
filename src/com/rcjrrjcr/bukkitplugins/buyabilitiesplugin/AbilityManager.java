@@ -76,16 +76,19 @@ public class AbilityManager
 	public synchronized void rentAbility(String worldName, String playerName, String abilityName)
 	{
 		PurchasedAbility p = new PurchasedAbility(origin.settings.getAbility(abilityName),playerName, worldName, PurchasedAbilityType.RENT);
+		//TODO: Add ways to prevent existing permissions from being associated with the ability
 		addPlayerAbility(p);
 	}
 	public synchronized void buyAbility(String worldName, String playerName, String abilityName)
 	{
 		PurchasedAbility p = new PurchasedAbility(origin.settings.getAbility(abilityName),playerName, worldName, PurchasedAbilityType.BUY);
+		//TODO: Add ways to prevent existing permissions from being associated with the ability
 		addPlayerAbility(p);
 	}
 	public synchronized void useCountAbility(String worldName, String playerName, String abilityName)
 	{
 		PurchasedAbility p = new PurchasedAbility(origin.settings.getAbility(abilityName),playerName, worldName, PurchasedAbilityType.USE);
+		//TODO: Add ways to prevent existing permissions from being associated with the ability
 		addPlayerAbility(p);
 	}
 	public synchronized void removePlayerAbility(String worldName, String playerName, String abilityName)

@@ -1,6 +1,7 @@
 package com.rcjrrjcr.bukkitplugins.buyabilitiesplugin;
 
-import org.bukkit.event.server.PluginEvent;
+import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.server.ServerListener;
 import org.bukkit.plugin.Plugin;
 
@@ -26,7 +27,7 @@ public class BuyAbilitiesServerListener extends ServerListener {
 		econActive = hooks.isEconActive();
 	}
 	@Override
-	public void onPluginEnabled(PluginEvent event)
+	public void onPluginEnable(PluginEnableEvent event)
 	{
 		System.out.println("BuyAbilities: PluginEnabled event detected!");
 		Plugin permPlugin = null;
@@ -88,7 +89,7 @@ public class BuyAbilitiesServerListener extends ServerListener {
 	}
 	
 	@Override
-	public void onPluginDisabled(PluginEvent event)
+	public void onPluginDisable(PluginDisableEvent event)
 	{
 		if(permActive)
 		{
