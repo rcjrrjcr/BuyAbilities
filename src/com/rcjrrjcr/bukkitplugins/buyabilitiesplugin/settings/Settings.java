@@ -75,18 +75,18 @@ public class Settings {
 			ab.info.help = yamlConfig.getString("Abilities."+abilityName+".info.help","Default Ability HelpText");
 			ab.perms.addAll(yamlConfig.getStringList("Abilities."+abilityName+".permissions", new ArrayList<String>()));
 			ab.categories = yamlConfig.getStringList("Abilities."+abilityName+".categories", new ArrayList<String>());
-			if((yamlConfig.getNode("Abilities."+abilityName+"costs.buy")!=null)&&(yamlConfig.getInt("Abilities."+abilityName+"costs.buy.cost", 0)!=0))
+			if(yamlConfig.getNode("Abilities."+abilityName+".costs.buy")!=null)
 			{
 				ab.costs.canBuy = true;
 				ab.costs.buyCost = yamlConfig.getInt("Abilities."+abilityName+"costs.buy.cost", 0);
 			}
-			if(yamlConfig.getNode("Abilities."+abilityName+"costs.rent")!=null&&(yamlConfig.getInt("Abilities."+abilityName+"costs.rent.duration", 0)>0))
+			if(yamlConfig.getNode("Abilities."+abilityName+".costs.rent")!=null&&(yamlConfig.getInt("Abilities."+abilityName+"costs.rent.duration", 0)>0))
 			{
 				ab.costs.canRent = true;
 				ab.costs.rentCost = yamlConfig.getInt("Abilities."+abilityName+"costs.rent.cost", 0);
 				ab.costs.rentDuration = yamlConfig.getInt("Abilities."+abilityName+"costs.rent.duration", 0);
 			}
-			if(yamlConfig.getNode("Abilities."+abilityName+"costs.use")!=null&&(yamlConfig.getInt("Abilities."+abilityName+"costs.use.usecount", 0)>0)&&(yamlConfig.getStringList("Abilities."+abilityName+"commands",null)!=null)&&(!yamlConfig.getStringList("Abilities."+abilityName+"commands",null).isEmpty()))
+			if(yamlConfig.getNode("Abilities."+abilityName+".costs.use")!=null&&(yamlConfig.getInt("Abilities."+abilityName+"costs.use.usecount", 0)>0)&&(yamlConfig.getStringList("Abilities."+abilityName+"commands",null)!=null)&&(!yamlConfig.getStringList("Abilities."+abilityName+"commands",null).isEmpty()))
 			{
 				ab.costs.canUse = true;
 				ab.costs.useCost = yamlConfig.getInt("Abilities."+abilityName+"costs.use.cost", 0);
@@ -163,14 +163,14 @@ public class Settings {
 		Ability ab = nameToAbilityMap.get(abilityName);
 		for(String categoryName : ab.categories)
 		{
-			 if(origin.hasPermission(world, player.getName(), "buyabilities.abilities."+categoryName.replace(' ', '.'))) return true;
+			 if(canAccess(categoryName,world,player)) return true;
 		}
 		return false;
 	}
 
 	public boolean canAccess(String categoryName,String world, Player player)
 	{
-		return origin.hasPermission(world, player.getName(), categoryName.replace(" ", ".")  );
+		 return origin.hasPermission( world, player.getName(), "buyabilities.abilities."+categoryName.replace(' ', '.') );
 	}
 	
 	public Ability getAbility(String abilityName)

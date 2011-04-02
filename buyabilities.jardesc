@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
     <jar path="BuyAbilities.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/BuyAbilities/buyabilties.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/BuyAbilities/bab.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="false" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
     <manifest generateManifest="false" manifestLocation="/PayDay/main/MANIFEST.MF" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
@@ -11,10 +11,12 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=BuyAbilities/src"/>
         <file path="/BuyAbilities/README"/>
-        <file path="/BuyAbilities/GPL"/>
-        <javaElement handleIdentifier="=RcjrUtil/src"/>
         <javaElement handleIdentifier="=BuyAbilities/main"/>
+        <folder path="/RcjrUtil/.git"/>
+        <folder path="/RcjrUtil/.settings"/>
+        <javaElement handleIdentifier="=BuyAbilities/src"/>
+        <javaElement handleIdentifier="=RcjrUtil/src"/>
+        <file path="/BuyAbilities/GPL"/>
     </selectedElements>
 </jardesc>

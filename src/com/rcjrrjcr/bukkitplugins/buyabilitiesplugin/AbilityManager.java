@@ -70,6 +70,9 @@ public class AbilityManager
 	
 	public boolean hasPermission(String worldName, String playerName, String nodeName)
 	{
+		if(worldName==null||playerName==null||nodeName==null) return false;
+		if(origin.getServer().getWorld(worldName)==null) return false;
+		if(origin.getServer().getPlayer(playerName)==null) return false;
 		return origin.pHandler.hasPerm(worldName, playerName, nodeName);
 	}
 	

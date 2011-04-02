@@ -327,7 +327,7 @@ public class BuyAbilities extends RcjrPlugin
 		}
 		if(args.length == 0)
 		{
-			ChatHelper.sendMsgWrap(COLOR_CHAT,"Help: /bab [categories|category|page|current|buy|rent|retuse|info].",player);
+			ChatHelper.sendMsgWrap(COLOR_CHAT,"Help: /bab [categories|category|page|current|buy|rent|rentuse|info].",player);
 			return true;			
 		}
 		else if(args[0].equalsIgnoreCase("categories"))
@@ -374,7 +374,7 @@ public class BuyAbilities extends RcjrPlugin
 					pageNo = 1;
 				}
 			}
-			if(!settings.canAccess(args[1], player.getWorld().getName(), player))
+			if(!( settings.canAccess(args[1], player.getWorld().getName(), player) ) )
 			{
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"Unable to access category.", player);
 				return true;
@@ -489,6 +489,11 @@ public class BuyAbilities extends RcjrPlugin
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"You already have this ability.", player);
 				return true;	
 			}
+			if(!settings.canPurchase(abilityName, player.getWorld().getName(), player))
+			{
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"You cannot access this ability.", player);
+				return true;
+			}
 			if(!ab.costs.canBuy)
 			{
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"Unable to buy this ability.", player);
@@ -530,6 +535,11 @@ public class BuyAbilities extends RcjrPlugin
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"You already have this ability.", player);
 				return true;	
 			}
+			if(!settings.canPurchase(abilityName, player.getWorld().getName(), player))
+			{
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"You cannot access this ability.", player);
+				return true;
+			}
 			if(!ab.costs.canRent)
 			{
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"Unable to rent this ability.", player);
@@ -570,6 +580,11 @@ public class BuyAbilities extends RcjrPlugin
 			{
 				ChatHelper.sendMsgWrap(COLOR_CHAT,"You already have this ability.", player);
 				return true;	
+			}
+			if(!settings.canPurchase(abilityName, player.getWorld().getName(), player))
+			{
+				ChatHelper.sendMsgWrap(COLOR_CHAT,"You cannot access this ability.", player);
+				return true;
 			}
 			if(!ab.costs.canUse)
 			{
@@ -691,9 +706,9 @@ public class BuyAbilities extends RcjrPlugin
 	
 	public Boolean hasPermission(String world, String playerName, String perm)
 	{
-		if(world==null||playerName==null||perm==null) return null;
-		if(getServer().getWorld(world)==null) return null;
-		if(getServer().getPlayer(playerName)==null) return null;
+		if(world==null||playerName==null||perm==null) return false;
+		if(getServer().getWorld(world)==null) return false;
+		if(getServer().getPlayer(playerName)==null) return false;
 		return pHandler.hasPerm(world, playerName, perm);
 	}
 	public Integer balance(String playerName)

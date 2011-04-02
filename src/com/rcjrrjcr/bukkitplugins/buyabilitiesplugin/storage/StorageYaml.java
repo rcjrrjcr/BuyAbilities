@@ -12,7 +12,7 @@ import org.bukkit.util.config.ConfigurationNode;
 
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.BuyAbilities;
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.PurchasedAbility;
-
+//TODO: Add per-player saving
 public class StorageYaml implements IStorage {
 
 	private File yamlFile;
