@@ -636,7 +636,7 @@ public class BuyAbilities extends RcjrPlugin
 			if(catString.length() > 0)catString = catString.substring(0, catString.length() - 2);
 			ChatHelper.sendMsgWrap(COLOR_CHAT,ab.name+" from category/categories "+catString, player);
 			ChatHelper.sendMsgWrap(COLOR_CHAT,ab.info.desc, player);
-			ChatHelper.sendMsgWrap(COLOR_CHAT,ab.costs.toString(), player);
+			ChatHelper.sendMsgWrap(COLOR_CHAT,ab.costs.shortString(), player);
 			return true;
 		}
 		else if(args[0].equalsIgnoreCase("help"))

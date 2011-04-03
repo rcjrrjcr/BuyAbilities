@@ -78,19 +78,19 @@ public class Settings {
 			if(yamlConfig.getNode("Abilities."+abilityName+".costs.buy")!=null)
 			{
 				ab.costs.canBuy = true;
-				ab.costs.buyCost = yamlConfig.getInt("Abilities."+abilityName+"costs.buy.cost", 0);
+				ab.costs.buyCost = yamlConfig.getInt("Abilities."+abilityName+".costs.buy.cost", 0);
 			}
-			if(yamlConfig.getNode("Abilities."+abilityName+".costs.rent")!=null&&(yamlConfig.getInt("Abilities."+abilityName+"costs.rent.duration", 0)>0))
+			if(yamlConfig.getNode("Abilities."+abilityName+".costs.rent")!=null&&(yamlConfig.getInt("Abilities."+abilityName+".costs.rent.duration", 0)>0))
 			{
 				ab.costs.canRent = true;
-				ab.costs.rentCost = yamlConfig.getInt("Abilities."+abilityName+"costs.rent.cost", 0);
-				ab.costs.rentDuration = yamlConfig.getInt("Abilities."+abilityName+"costs.rent.duration", 0);
+				ab.costs.rentCost = yamlConfig.getInt("Abilities."+abilityName+".costs.rent.cost", 0);
+				ab.costs.rentDuration = yamlConfig.getInt("Abilities."+abilityName+".costs.rent.duration", 0);
 			}
-			if(yamlConfig.getNode("Abilities."+abilityName+".costs.use")!=null&&(yamlConfig.getInt("Abilities."+abilityName+"costs.use.usecount", 0)>0)&&(yamlConfig.getStringList("Abilities."+abilityName+"commands",null)!=null)&&(!yamlConfig.getStringList("Abilities."+abilityName+"commands",null).isEmpty()))
+			if(yamlConfig.getNode("Abilities."+abilityName+".costs.use")!=null&&(yamlConfig.getInt("Abilities."+abilityName+".costs.use.usecount", 0)>0)&&(yamlConfig.getStringList("Abilities."+abilityName+".commands",null)!=null)&&(!yamlConfig.getStringList("Abilities."+abilityName+".commands",null).isEmpty()))
 			{
 				ab.costs.canUse = true;
-				ab.costs.useCost = yamlConfig.getInt("Abilities."+abilityName+"costs.use.cost", 0);
-				ab.costs.useCount = yamlConfig.getInt("Abilities."+abilityName+"costs.use.usecount", 0);
+				ab.costs.useCost = yamlConfig.getInt("Abilities."+abilityName+".costs.use.cost", 0);
+				ab.costs.useCount = yamlConfig.getInt("Abilities."+abilityName+".costs.use.usecount", 0);
 			}
 			List<String> rgxList = yamlConfig.getStringList("Abilities."+abilityName+".commands",new LinkedList<String>());
 //			System.out.println(rgxList);
