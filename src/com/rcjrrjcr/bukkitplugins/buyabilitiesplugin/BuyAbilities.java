@@ -15,6 +15,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
+import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 //import org.bukkit.plugin.java.JavaPlugin;
@@ -111,12 +112,12 @@ public class BuyAbilities extends RcjrPlugin
 		} catch (Exception e) {
 			System.out.println("BuyAbilities: Stored data not detected. If this is your first run, it's fine.");
 		}
-		try {
-			abManager.load(storage.getData());
-		} catch (Exception e) {
-			System.out.println("Malformed data.yml.");
-			e.printStackTrace();
-		}
+//		try {
+//			abManager.load(storage.getData());
+//		} catch (Exception e) {
+//			System.out.println("Malformed data.yml.");
+//			e.printStackTrace();
+//		}
 		//Start the checker thread
 		checker = new BuyAbilitiesChecker(this,checkInterval);
 		scheduler.scheduleAsyncRepeatingTask(this, checker, checkDelay, checkInterval);
@@ -124,7 +125,11 @@ public class BuyAbilities extends RcjrPlugin
 		//Register our events
 		getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, serverListener, Priority.Monitor, this);
 		getServer().getPluginManager().registerEvent(Type.PLUGIN_DISABLE, serverListener, Priority.Monitor, this);
+		
 		getServer().getPluginManager().registerEvent(Type.PLAYER_COMMAND_PREPROCESS, playerListener, Priority.Monitor, this);
+		getServer().getPluginManager().registerEvent(Type.PLAYER_JOIN, playerListener, Priority.Monitor, this);
+		getServer().getPluginManager().registerEvent(Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
+		getServer().getPluginManager().registerEvent(Type.PLAYER_KICK, playerListener, Priority.Monitor, this);
 	}
 	 /**
 	  Bukkit-called method. Prints notification of the disabling of the plugin to console.
@@ -740,6 +745,26 @@ public class BuyAbilities extends RcjrPlugin
 			abManager.decrement(worldName, playerName, ab.name);
 		}
 		
+	}
+	void processLogonLogoff(PlayerEvent event) throws Exception {
+		String playerName = event.getPlayer().getName();
+		
+		switch(event.getType())
+		{
+		case PLAYER_JOIN:
+			abManager.loadPlayer(storage.getPlayerData(playerName), playerName);
+			break;
+		case PLAYER_KICK:
+			//Don't save
+			abManager.saveAndUnloadPlayer(playerName);
+			break;
+		case PLAYER_QUIT:
+			storage.writePlayerData(abManager.saveAndUnloadPlayer(playerName), playerName);
+			break;
+		default:
+			throw new Exception("BuyAbilities: Non-Player(Join|Kick|Quit)Event passed to processLogonLogoff!");
+		}
+		return;
 	}
 }
 

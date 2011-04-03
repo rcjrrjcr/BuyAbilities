@@ -10,6 +10,9 @@ public interface IStorage
 {
 	public void init(BuyAbilities plugin) throws Exception;
 
-	public Iterable<PurchasedAbility> getData() throws Exception;
+	public Iterable<PurchasedAbility> getData();
 	public void writeData(Iterable<PurchasedAbility> data) throws IOException;
+	
+	public Iterable<PurchasedAbility> getPlayerData(String playerName);
+	public void writePlayerData(Iterable<PurchasedAbility> data, String playerName) throws IOException;
 }

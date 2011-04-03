@@ -1,8 +1,10 @@
 package com.rcjrrjcr.bukkitplugins.buyabilitiesplugin;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.PurchasedAbilityType;
@@ -11,14 +13,14 @@ public class AbilityManager
 {
 	List<PurchasedAbility> rentedAbilities;
 	List<PurchasedAbility> useCountAbilities;
-	HashMap<String,Set<PurchasedAbility>> currentAbilities;
+	Map<String,Set<PurchasedAbility>> currentAbilities;
 	BuyAbilities origin;
 	
 	public AbilityManager(BuyAbilities origin)
 	{
-		rentedAbilities = new LinkedList<PurchasedAbility>();
-		useCountAbilities = new LinkedList<PurchasedAbility>();
-		currentAbilities = new HashMap<String, Set<PurchasedAbility> >();
+		rentedAbilities = Collections.synchronizedList(new LinkedList<PurchasedAbility>());
+		useCountAbilities = Collections.synchronizedList(new LinkedList<PurchasedAbility>());
+		currentAbilities = Collections.synchronizedMap(new HashMap<String, Set<PurchasedAbility> >());
 		this.origin = origin;
 		return;
 	}
@@ -50,18 +52,20 @@ public class AbilityManager
 	
 	private synchronized void addPlayerAbility(PurchasedAbility p)
 	{
-		List<String> abPerms = p.perms;
-		for(String node : abPerms)
+		List<String> abPerms = p.perms; 
+		List<String> newPerms = new LinkedList<String>();
+		for(String node : abPerms) //CME occurs due to iteration
 		{
-			if(origin.pHandler.hasPerm(p.world, p.playerName,node))
+			if(!origin.pHandler.hasPerm(p.world, p.playerName,node))
 			{
-				abPerms.remove(node);
+				newPerms.add(node);
 			}
 			else
 			{
 				origin.pHandler.addPerm(p.world, p.playerName, node);
 			}
 		}
+		p.perms = newPerms;
 		if(p.type == PurchasedAbilityType.RENT) rentedAbilities.add(p);
 		if(p.type == PurchasedAbilityType.USE) useCountAbilities.add(p);
 		if(currentAbilities.get(p.playerName) == null) currentAbilities.put(p.playerName, new HashSet<PurchasedAbility>());
@@ -140,6 +144,42 @@ public class AbilityManager
 		}
 		return abList;
 	}
+	synchronized void loadPlayer(Iterable<PurchasedAbility> data, String playerName)
+	{
+		System.out.println("Loading player \""+playerName+"\"'s data!");
+		if(data == null) return;
+		Set<PurchasedAbility> pAbilities = getPlayer(playerName);
+		if(!pAbilities.isEmpty())
+		{
+			for(PurchasedAbility pAb : pAbilities)
+			{
+				removePlayerAbility(pAb);
+			}
+		}
+		
+		for(PurchasedAbility nAb : data)
+		{
+			if(nAb.playerName.equalsIgnoreCase(playerName)) addPlayerAbility(nAb);
+		}
+		return;
+	}
+	synchronized Iterable<PurchasedAbility> saveAndUnloadPlayer(String playerName)
+	{
+		System.out.println("Unloading player \""+playerName+"\"'s data!");
+		Set<PurchasedAbility> pAbilities = getPlayer(playerName);
+		Set<PurchasedAbility> pSaved = new HashSet<PurchasedAbility>(pAbilities.size());
+//		System.out.println(pAbilities);
+		if(!pAbilities.isEmpty())
+		{
+			for(PurchasedAbility pAb : pAbilities)
+			{
+				pSaved.add((PurchasedAbility) pAb.clone());
+				removePlayerAbility(pAb);
+			}
+		}
+//		System.out.println(pSaved);
+		return pSaved;
+	}
 	public synchronized void decrement(String worldName, String playerName, String abilityName)
 	{
 //		System.out.println("World: "+ worldName+" Player: "+playerName+" Ability: "+abilityName);
@@ -151,24 +191,37 @@ public class AbilityManager
 	}
 	synchronized void update(final int interval)
 	{
+		List<PurchasedAbility> rented = new LinkedList<PurchasedAbility>();
+		List<PurchasedAbility> useCount = new LinkedList<PurchasedAbility>();
+		
 		for(PurchasedAbility p : rentedAbilities)
 		{
-			if(origin.getServer().getPlayer(p.playerName)==null||!origin.getServer().getPlayer(p.playerName).isOnline()) continue;
-			p.duration -= interval;
-			if(p.duration <= 0)
+			if(origin.getServer().getPlayer(p.playerName)!=null&&origin.getServer().getPlayer(p.playerName).isOnline())
 			{
-				currentAbilities.get(p.playerName).remove(p);
-				rentedAbilities.remove(p);
+				p.duration -= interval;
+				if(p.duration <= 0)
+				{
+					currentAbilities.get(p.playerName).remove(p);
+					continue;
+//					rentedAbilities.remove(p);
+				}
 			}
+			rented.add(p);
 		}
+		rentedAbilities = rented;
+		
 		for(PurchasedAbility u : useCountAbilities)
 		{
-			if(origin.getServer().getPlayer(u.playerName)==null||!origin.getServer().getPlayer(u.playerName).isOnline()) continue;
-			if(u.duration <= 0)
+			if(origin.getServer().getPlayer(u.playerName)!=null&&origin.getServer().getPlayer(u.playerName).isOnline())
 			{
-				currentAbilities.get(u.playerName).remove(u);
-				rentedAbilities.remove(u);
+				if(u.duration <= 0)
+				{
+					currentAbilities.get(u.playerName).remove(u);
+					continue;
+				}
 			}
+			useCount.add(u);
 		}
+		useCountAbilities = useCount;
 	}
 }

@@ -7,7 +7,7 @@ import java.util.List;
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.settings.Ability;
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.PurchasedAbilityType;
 
-public class PurchasedAbility implements Comparable<PurchasedAbility> 
+public class PurchasedAbility implements Comparable<PurchasedAbility>, Cloneable
 {
 	public String abilityName;
 	public String extName;
@@ -53,5 +53,37 @@ public class PurchasedAbility implements Comparable<PurchasedAbility>
 		if(type == PurchasedAbilityType.RENT) duration = a.costs.rentDuration;
 		if(type == PurchasedAbilityType.USE) duration = a.costs.useCount;
 	}
+	private PurchasedAbility(PurchasedAbility p)
+	{
+		this.abilityName = new String(p.abilityName);
+		this.extName = new String(p.extName);
+		this.perms = new LinkedList<String>();
+		for(String perm : p.perms)
+		{
+			this.perms.add(new String(perm));
+		}
+		this.playerName = new String(p.playerName);
+		this.world = new String(p.world);
+		this.duration = p.duration;
+		this.type = p.type;
+	}
+	@Override
+	public Object clone()
+	{
+		return new PurchasedAbility(this);
+	}
 	
+	public boolean valueEquals(Object obj)
+	{
+		if(!(obj instanceof PurchasedAbility)) return false;
+		PurchasedAbility p = (PurchasedAbility) obj;
+		if(!abilityName.equals(p.abilityName)) return false;
+		if(!extName.equals(p.extName)) return false;
+		if(!playerName.equals(p.playerName)) return false;
+		if(!world.equals(p.world)) return false;
+		if(duration != p.duration) return false;
+		if(type != p.type) return false;
+		if(!(perms.containsAll(p.perms)&&p.perms.containsAll(perms)) ) return false;
+		return true;
+	}
 }
