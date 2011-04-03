@@ -3,6 +3,7 @@ package com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 //import java.util.List;
 import java.util.Map;
@@ -45,7 +46,7 @@ public class StorageYaml implements IStorage {
 	
 
 	@Override
-	public Iterable<PurchasedAbility> getData() {
+	public Collection<PurchasedAbility> getData() {
 		Map<String, ConfigurationNode> data = yamlConfig.getNodes("Data");
 		ArrayList<PurchasedAbility> result = new ArrayList<PurchasedAbility>();
 		if(data == null||data.isEmpty())
@@ -55,7 +56,7 @@ public class StorageYaml implements IStorage {
 		}
 		for(String playerName : data.keySet())
 		{
-			Iterable<PurchasedAbility> playerData = getPlayerData(playerName);
+			Collection<PurchasedAbility> playerData = getPlayerData(playerName);
 			for(PurchasedAbility ab : playerData)
 			{
 				result.add(ab);
@@ -65,7 +66,7 @@ public class StorageYaml implements IStorage {
 	}
 
 	@Override
-	public void writeData(Iterable<PurchasedAbility> data) throws IOException
+	public void writeData(Collection<PurchasedAbility> data) throws IOException
 	{
 //		yamlFile.delete();
 //		yamlFile.createNewFile();
@@ -87,7 +88,7 @@ public class StorageYaml implements IStorage {
 
 
 	@Override
-	public Iterable<PurchasedAbility> getPlayerData(String playerName){
+	public Collection<PurchasedAbility> getPlayerData(String playerName){
 		
 		Map<String, ConfigurationNode> playerData = yamlConfig.getNodes("Data."+playerName);
 		ArrayList<PurchasedAbility> result = new ArrayList<PurchasedAbility>();
@@ -130,7 +131,7 @@ public class StorageYaml implements IStorage {
 
 
 	@Override
-	public void writePlayerData(Iterable<PurchasedAbility> data, String playerName)
+	public void writePlayerData(Collection<PurchasedAbility> data, String playerName)
 			throws IOException {
 		yamlConfig.removeProperty("Data."+playerName);
 		for(PurchasedAbility pAb : data)

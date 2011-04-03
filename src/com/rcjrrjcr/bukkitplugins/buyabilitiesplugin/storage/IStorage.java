@@ -1,6 +1,7 @@
 package com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage;
 
 import java.io.IOException;
+import java.util.Collection;
 //import java.util.List;
 
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.BuyAbilities;
@@ -10,9 +11,9 @@ public interface IStorage
 {
 	public void init(BuyAbilities plugin) throws Exception;
 
-	public Iterable<PurchasedAbility> getData();
-	public void writeData(Iterable<PurchasedAbility> data) throws IOException;
+	public Collection<PurchasedAbility> getData();
+	public void writeData(Collection<PurchasedAbility> data) throws IOException;
 	
-	public Iterable<PurchasedAbility> getPlayerData(String playerName);
-	public void writePlayerData(Iterable<PurchasedAbility> data, String playerName) throws IOException;
+	public Collection<PurchasedAbility> getPlayerData(String playerName);
+	public void writePlayerData(Collection<PurchasedAbility> data, String playerName) throws IOException;
 }

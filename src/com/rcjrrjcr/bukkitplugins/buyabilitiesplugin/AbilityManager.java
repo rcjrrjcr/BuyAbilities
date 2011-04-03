@@ -1,5 +1,6 @@
 package com.rcjrrjcr.bukkitplugins.buyabilitiesplugin;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -122,7 +123,7 @@ public class AbilityManager
 		currentAbilities.get(p.playerName).remove(p);
 	}
 	
-	synchronized void load(Iterable<PurchasedAbility> data)
+	synchronized void load(Collection<PurchasedAbility> data)
 	{
 		if(data==null) return;
 		rentedAbilities.clear();
@@ -134,7 +135,7 @@ public class AbilityManager
 			addPlayerAbility(p);
 		}
 	}
-	synchronized Iterable<PurchasedAbility> save()
+	synchronized Collection<PurchasedAbility> save()
 	{
 		List<PurchasedAbility> abList = new LinkedList<PurchasedAbility>();
 		for(Set<PurchasedAbility> pSet : currentAbilities.values())
@@ -144,7 +145,7 @@ public class AbilityManager
 		}
 		return abList;
 	}
-	synchronized void loadPlayer(Iterable<PurchasedAbility> data, String playerName)
+	synchronized void loadPlayer(Collection<PurchasedAbility> data, String playerName)
 	{
 		System.out.println("Loading player \""+playerName+"\"'s data!");
 		if(data == null) return;
@@ -163,7 +164,7 @@ public class AbilityManager
 		}
 		return;
 	}
-	synchronized Iterable<PurchasedAbility> saveAndUnloadPlayer(String playerName)
+	synchronized Collection<PurchasedAbility> saveAndUnloadPlayer(String playerName)
 	{
 		System.out.println("Unloading player \""+playerName+"\"'s data!");
 		Set<PurchasedAbility> pAbilities = getPlayer(playerName);
