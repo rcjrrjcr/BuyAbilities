@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+//import javax.script.ScriptEngine;
+
 import org.bukkit.entity.Player;
 import org.bukkit.util.config.Configuration;
 import org.bukkit.util.config.ConfigurationNode;
@@ -39,7 +41,9 @@ public class Settings {
 		yamlFile = new File(path);
 		if(!(yamlFile.exists()))
 		{
-			throw new Exception(path + " not found.");
+			System.out.println(path + " not found.");
+			System.out.println("Creating " + path + "...");
+			yamlFile.createNewFile();
 		}
 		if(!(yamlFile.isFile()))
 		{
@@ -86,11 +90,22 @@ public class Settings {
 				ab.costs.rentCost = yamlConfig.getInt("Abilities."+abilityName+".costs.rent.cost", 0);
 				ab.costs.rentDuration = yamlConfig.getInt("Abilities."+abilityName+".costs.rent.duration", 0);
 			}
-			if(yamlConfig.getNode("Abilities."+abilityName+".costs.use")!=null&&(yamlConfig.getInt("Abilities."+abilityName+".costs.use.usecount", 0)>0)&&(yamlConfig.getStringList("Abilities."+abilityName+".commands",null)!=null)&&(!yamlConfig.getStringList("Abilities."+abilityName+".commands",null).isEmpty()))
+			if((yamlConfig.getStringList("Abilities."+abilityName+".commands",null)!=null)&&(!yamlConfig.getStringList("Abilities."+abilityName+".commands",null).isEmpty()))
 			{
-				ab.costs.canUse = true;
-				ab.costs.useCost = yamlConfig.getInt("Abilities."+abilityName+".costs.use.cost", 0);
-				ab.costs.useCount = yamlConfig.getInt("Abilities."+abilityName+".costs.use.usecount", 0);
+//				if(origin.getEngine()!=null)
+//				{
+//					List<String> onCommandScript = yamlConfig.getStringList("Abilities."+abilityName+".scripts.onCommand", null);
+//					if(onCommandScript!=null&&!onCommandScript.isEmpty())
+//					{
+//						ab.onCommandScript = onCommandScript;
+//					}
+//				}
+				if(yamlConfig.getNode("Abilities."+abilityName+".costs.use")!=null&&(yamlConfig.getInt("Abilities."+abilityName+".costs.use.usecount", 0)>0))
+				{
+					ab.costs.canUse = true;
+					ab.costs.useCost = yamlConfig.getInt("Abilities."+abilityName+".costs.use.cost", 0);
+					ab.costs.useCount = yamlConfig.getInt("Abilities."+abilityName+".costs.use.usecount", 0);
+				}
 			}
 			List<String> rgxList = yamlConfig.getStringList("Abilities."+abilityName+".commands",new LinkedList<String>());
 //			System.out.println(rgxList);
@@ -215,6 +230,7 @@ public class Settings {
 	{
 		return categorySearch.getMisses(categoryName, threshold);
 	}
+	
 }
 
 

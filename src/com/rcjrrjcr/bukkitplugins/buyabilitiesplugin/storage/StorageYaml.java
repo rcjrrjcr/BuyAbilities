@@ -27,7 +27,9 @@ public class StorageYaml implements IStorage {
 		yamlFile = new File(path);
 		if(!(yamlFile.exists()))
 		{
-			throw new Exception(path + " not found.");
+			System.out.println(path + " not found.");
+			System.out.println("Creating " + path + "...");
+			yamlFile.createNewFile();
 		}
 		if(!(yamlFile.isFile()))
 		{
@@ -72,7 +74,7 @@ public class StorageYaml implements IStorage {
 //		yamlFile.createNewFile();
 //		assert(yamlFile != null);
 //		yamlConfig = new Configuration(yamlFile);
-		yamlConfig.removeProperty("Data");
+		if(yamlConfig.getProperty("Data")!=null)yamlConfig.removeProperty("Data");
 		for(PurchasedAbility pAb : data)
 		{
 			//System.out.println(pAb.toString());
@@ -133,7 +135,7 @@ public class StorageYaml implements IStorage {
 	@Override
 	public void writePlayerData(Collection<PurchasedAbility> data, String playerName)
 			throws IOException {
-		yamlConfig.removeProperty("Data."+playerName);
+		if(yamlConfig.getProperty("Data"+playerName)!=null)yamlConfig.removeProperty("Data."+playerName);
 		for(PurchasedAbility pAb : data)
 		{
 //			System.out.println(pAb.toString());

@@ -7,6 +7,11 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+//
+//import javax.script.Invocable;
+//import javax.script.ScriptEngine;
+//import javax.script.ScriptEngineFactory;
+//import javax.script.ScriptEngineManager;
 //import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -65,7 +70,15 @@ public class BuyAbilities extends RcjrPlugin
 	BuyAbilitiesChecker checker;
 	private final Integer checkDelay = 5;
 	private final Integer checkInterval = 10;
+//	private ScriptEngine engine;
+	
 //	public PluginStruct active;
+	
+//	
+//	public ScriptEngine getEngine()
+//	{
+//		return engine;
+//	}
 	/**
 	 Bukkit-called method. Creates appropriate instances of economy, permissions and storage plugins. Also starts thread to check for permission expiry.
 	 
@@ -85,14 +98,35 @@ public class BuyAbilities extends RcjrPlugin
 			pm.disablePlugin(this);
 		}
 		
+//		engine = null;
+//		ScriptEngineManager mgr = new ScriptEngineManager();
+//		List<ScriptEngineFactory> factories = 
+//			mgr.getEngineFactories();
+//		for (ScriptEngineFactory factory: factories) {
+//			String langName = factory.getLanguageName();
+//			String langVersion = factory.getLanguageVersion();
+//			if (langName.equals("ECMAScript") && langVersion.equals("1.6") && factory.getEngineName().equals("Mozilla Rhino")) {
+//				engine = factory.getScriptEngine();
+//				break;
+//			}
+//		} 
+//		
+//		if(engine==null||!(engine instanceof Invocable))
+//		{
+//			engine = null;
+//			System.out.println("BuyAbilities: Scripting capabilities disabled.");
+//		}
+//		else System.out.println("BuyAbilities: Scripting capabilities enabled.");
+		
+		
+		
+		PluginDescriptionFile pdfFile = this.getDescription();
 		if(!(active.getStatus()))
 		{
-			PluginDescriptionFile pdfFile = this.getDescription();
 			System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " is inactive." );
 		}
 		else
 		{
-			PluginDescriptionFile pdfFile = this.getDescription();
 			System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled!" );
 		}
 		serverListener  = new BuyAbilitiesServerListener(this,active);
@@ -199,7 +233,20 @@ public class BuyAbilities extends RcjrPlugin
 			econPlugin = pm.getPlugin("Essentials");
 			if(econPlugin == null)
 			{
-				throw new Exception("No Economy Plugin found!");
+				econPlugin = pm.getPlugin("BOSEconomy");
+				if(econPlugin == null)
+				{
+					throw new Exception("No Economy Plugin found!");
+				}
+				else if(!(econPlugin.isEnabled()))
+				{
+					econ = false;
+					eHandler = null;
+				}
+				else
+				{
+					eHandler = EconFactory.getInstance(EconPlugin.BOS, econPlugin,this);
+				}
 			}
 			else if(!(econPlugin.isEnabled()))
 			{
@@ -711,9 +758,21 @@ public class BuyAbilities extends RcjrPlugin
 	
 	public Boolean hasPermission(String world, String playerName, String perm)
 	{
-		if(world==null||playerName==null||perm==null) return false;
-		if(getServer().getWorld(world)==null) return false;
-		if(getServer().getPlayer(playerName)==null) return false;
+		if(world==null||playerName==null||perm==null)
+		{
+			System.out.println("Arguments are null!");
+			return false;
+		}
+		if(getServer().getWorld(world)==null){
+
+			System.out.println("World does not exist!");
+			return false;
+		}
+		if(getServer().getPlayer(playerName)==null) 
+		{
+			System.out.println("Player not online!");
+			return false;
+		}
 		return pHandler.hasPerm(world, playerName, perm);
 	}
 	public Integer balance(String playerName)

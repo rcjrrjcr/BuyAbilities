@@ -82,6 +82,17 @@ public class BuyAbilitiesServerListener extends ServerListener {
 					econActive = true;
 					return;
 				}
+				else
+				{
+					econPlugin = plugin.getServer().getPluginManager().getPlugin("BOSEconomy");
+					if(econPlugin != null && econPlugin.isEnabled())
+					{
+						System.out.println("BuyAbilities: Hooking into BOSEconomy.");
+						plugin.setEconomy(econPlugin, EconPlugin.BOS);
+						econActive = true;
+						return;
+					}
+				}
 			}
 		}
 		

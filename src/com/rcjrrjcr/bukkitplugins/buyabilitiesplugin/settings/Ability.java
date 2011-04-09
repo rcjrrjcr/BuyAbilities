@@ -12,6 +12,10 @@ public class Ability {
 	public List<String> categories;
 	public Costs costs;
 	public List<String> commands;
+	
+//	public List<String> onCommandScript;
+//	public List<String> onActivateScript;
+//	public List<String> onExpireScript;
 
 	public Ability() {
 		perms = new ArrayList<String>();
@@ -19,5 +23,8 @@ public class Ability {
 		info = new Info();
 		costs = new Costs();
 		commands = new LinkedList<String>();
+//		onCommandScript = new LinkedList<String>();
+//		onActivateScript = new LinkedList<String>();
+//		onExpireScript = new LinkedList<String>();
 	}
 }

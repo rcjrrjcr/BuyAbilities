@@ -5,5 +5,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/RcjrUtil"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/RecommendedBukkit"/>
+	<classpathentry kind="lib" path="C:/Users/Ryan/Desktop/RCBukkitDev/Dependencies/js.jar" sourcepath="C:/Users/Ryan/Desktop/RCBukkitDev/Dependencies/rhino1_7R2.zip"/>
+	<classpathentry kind="lib" path="C:/Users/Ryan/Desktop/RCBukkitDev/Dependencies/js-14.jar" sourcepath="C:/Users/Ryan/Desktop/RCBukkitDev/Dependencies/rhino1_7R2.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
