@@ -1,30 +1,22 @@
 package com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.settings;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-//import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Ability {
 	public String name;
 	public Info info;
-	public List<String> perms;
-	public List<String> categories;
+	public Set<String> perms;
+	public Set<String> categories;
 	public Costs costs;
-	public List<String> commands;
+	public Set<String> commands;
 	
-//	public List<String> onCommandScript;
-//	public List<String> onActivateScript;
-//	public List<String> onExpireScript;
 
 	public Ability() {
-		perms = new ArrayList<String>();
-		categories = new ArrayList<String>();
+		perms = new HashSet<String>();
+		categories = new HashSet<String>();
 		info = new Info();
 		costs = new Costs();
-		commands = new LinkedList<String>();
-//		onCommandScript = new LinkedList<String>();
-//		onActivateScript = new LinkedList<String>();
-//		onExpireScript = new LinkedList<String>();
+		commands = new HashSet<String>();
 	}
 }

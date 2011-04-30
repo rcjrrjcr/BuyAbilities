@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 //import javax.script.ScriptEngine;
 
@@ -26,7 +27,7 @@ public class Settings {
 	private Configuration yamlConfig;
 	private HashMap<String,Ability> nameToAbilityMap;
 	private HashMap<String,Set<Ability>> categoryToAbilityMap;
-	private HashMap<String,Set<Ability>> commandRegex;
+	private HashMap<Pattern,Set<Ability>> commandRegex;
 	private SearchHelper abilitySearch;
 	private SearchHelper categorySearch;
 	
@@ -36,7 +37,7 @@ public class Settings {
 		categorySearch = new SearchHelper();
 		nameToAbilityMap = new HashMap<String,Ability>();
 		categoryToAbilityMap = new HashMap<String,Set<Ability>>();
-		commandRegex = new HashMap<String,Set<Ability>>();
+		commandRegex = new HashMap<Pattern,Set<Ability>>();
 		this.origin = origin; 
 		yamlFile = new File(path);
 		if(!(yamlFile.exists()))
@@ -78,7 +79,7 @@ public class Settings {
 			ab.info.desc = yamlConfig.getString("Abilities."+abilityName+".info.description","Default Ability Description");
 			ab.info.help = yamlConfig.getString("Abilities."+abilityName+".info.help","Default Ability HelpText");
 			ab.perms.addAll(yamlConfig.getStringList("Abilities."+abilityName+".permissions", new ArrayList<String>()));
-			ab.categories = yamlConfig.getStringList("Abilities."+abilityName+".categories", new ArrayList<String>());
+			ab.categories = new HashSet<String>(yamlConfig.getStringList("Abilities."+abilityName+".categories", new ArrayList<String>()));
 			if(yamlConfig.getNode("Abilities."+abilityName+".costs.buy")!=null)
 			{
 				ab.costs.canBuy = true;
@@ -109,11 +110,12 @@ public class Settings {
 			}
 			List<String> rgxList = yamlConfig.getStringList("Abilities."+abilityName+".commands",new LinkedList<String>());
 //			System.out.println(rgxList);
-			ab.commands = rgxList;
+			ab.commands = new HashSet<String>(rgxList);
 			for(String regex : rgxList)
 			{
-				if(!commandRegex.containsKey(regex)) commandRegex.put(regex, new HashSet<Ability>());
-				commandRegex.get(regex).add(ab);
+			    Pattern p = Pattern.compile(regex,Pattern.CASE_INSENSITIVE);
+				if(!commandRegex.containsKey(p)) commandRegex.put(p, new HashSet<Ability>());
+				commandRegex.get(p).add(ab);
 			}
 			
 			nameToAbilityMap.put(ab.name, ab);
@@ -138,11 +140,11 @@ public class Settings {
 	{
 		return nameToAbilityMap.get(abilityName).info;
 	}
-	public List<String> getPerms(String abilityName)
+	public Set<String> getPerms(String abilityName)
 	{
 		return nameToAbilityMap.get(abilityName).perms;
 	}
-	public List<String> getAbilityCategories(String abilityName)
+	public Set<String> getAbilityCategories(String abilityName)
 	{
 		return nameToAbilityMap.get(abilityName).categories;
 	}
@@ -211,13 +213,13 @@ public class Settings {
 		return abList;
 	}
 	
-	public Set<String> getAllCmds()
+	public Set<Pattern> getAllCmds()
 	{
 		return commandRegex.keySet();
 	}
-	public Set<Ability> getCmdAbility(String cmd)
+	public Set<Ability> getCmdAbility(Pattern rgx)
 	{
-		Set<Ability> abSet = commandRegex.get(cmd);
+		Set<Ability> abSet = commandRegex.get(rgx);
 		if(abSet==null) return new HashSet<Ability>();
 		return abSet;
 	}

@@ -1,8 +1,8 @@
 package com.rcjrrjcr.bukkitplugins.buyabilitiesplugin;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -51,19 +51,20 @@ public class AbilityManager
 		return true;
 	}
 	
-	private synchronized void addPlayerAbility(PurchasedAbility p)
+	private synchronized void addPlayerAbility(PurchasedAbility p, boolean load)
 	{
-		List<String> abPerms = p.perms; 
-		List<String> newPerms = new LinkedList<String>();
-		for(String node : abPerms) //CME occurs due to iteration
+		Set<String> abPerms = p.perms; 
+		Set<String> newPerms = new HashSet<String>();
+		for(String node : abPerms)
 		{
 			if(!origin.pHandler.hasPerm(p.world, p.playerName,node))
 			{
-				newPerms.add(node);
-			}
-			else
-			{
 				origin.pHandler.addPerm(p.world, p.playerName, node);
+                newPerms.add(node);
+			}
+			else if(load)
+			{
+                newPerms.add(node);
 			}
 		}
 		p.perms = newPerms;
@@ -84,20 +85,17 @@ public class AbilityManager
 	public synchronized void rentAbility(String worldName, String playerName, String abilityName)
 	{
 		PurchasedAbility p = new PurchasedAbility(origin.settings.getAbility(abilityName),playerName, worldName, PurchasedAbilityType.RENT);
-		//TODO: Add ways to prevent existing permissions from being associated with the ability
-		addPlayerAbility(p);
+		addPlayerAbility(p,false);
 	}
 	public synchronized void buyAbility(String worldName, String playerName, String abilityName)
 	{
 		PurchasedAbility p = new PurchasedAbility(origin.settings.getAbility(abilityName),playerName, worldName, PurchasedAbilityType.BUY);
-		//TODO: Add ways to prevent existing permissions from being associated with the ability
-		addPlayerAbility(p);
+		addPlayerAbility(p,false);
 	}
 	public synchronized void useCountAbility(String worldName, String playerName, String abilityName)
 	{
 		PurchasedAbility p = new PurchasedAbility(origin.settings.getAbility(abilityName),playerName, worldName, PurchasedAbilityType.USE);
-		//TODO: Add ways to prevent existing permissions from being associated with the ability
-		addPlayerAbility(p);
+		addPlayerAbility(p,false);
 	}
 	public synchronized void removePlayerAbility(String worldName, String playerName, String abilityName)
 	{
@@ -109,7 +107,7 @@ public class AbilityManager
 	private synchronized void removePlayerAbility(PurchasedAbility p)
 	{
 		if(p == null) return;
-		List<String> abPerms = p.perms;
+		Set<String> abPerms = p.perms;
 
 		for(String node : abPerms)
 		{
@@ -123,7 +121,7 @@ public class AbilityManager
 		currentAbilities.get(p.playerName).remove(p);
 	}
 	
-	synchronized void load(Collection<PurchasedAbility> data)
+	synchronized void load(Set<PurchasedAbility> data)
 	{
 		if(data==null) return;
 		rentedAbilities.clear();
@@ -132,20 +130,20 @@ public class AbilityManager
 		{
 			if(p.perms==null) continue;
 			if(p.perms.isEmpty()) continue;
-			addPlayerAbility(p);
+			addPlayerAbility(p,true);
 		}
 	}
-	synchronized Collection<PurchasedAbility> save()
+	synchronized Set<PurchasedAbility> save()
 	{
-		List<PurchasedAbility> abList = new LinkedList<PurchasedAbility>();
+		Set<PurchasedAbility> abSet = new LinkedHashSet<PurchasedAbility>();
 		for(Set<PurchasedAbility> pSet : currentAbilities.values())
 		{
-			if(pSet.isEmpty()) continue;
-			abList.addAll(pSet);
+			if(pSet==null||pSet.isEmpty()) continue;
+			abSet.addAll(pSet);
 		}
-		return abList;
+		return abSet;
 	}
-	synchronized void loadPlayer(Collection<PurchasedAbility> data, String playerName)
+	synchronized void loadPlayer(Set<PurchasedAbility> data, String playerName)
 	{
 		System.out.println("Loading player \""+playerName+"\"'s data!");
 		if(data == null) return;
@@ -160,11 +158,11 @@ public class AbilityManager
 		
 		for(PurchasedAbility nAb : data)
 		{
-			if(nAb.playerName.equalsIgnoreCase(playerName)) addPlayerAbility(nAb);
+			if(nAb.playerName.equalsIgnoreCase(playerName)) addPlayerAbility(nAb,true);
 		}
 		return;
 	}
-	synchronized Collection<PurchasedAbility> saveAndUnloadPlayer(String playerName)
+	synchronized Set<PurchasedAbility> saveAndUnloadPlayer(String playerName)
 	{
 		System.out.println("Unloading player \""+playerName+"\"'s data!");
 		Set<PurchasedAbility> pAbilities = getPlayer(playerName);
@@ -188,6 +186,7 @@ public class AbilityManager
 		if(p==null) return;
 //		System.out.println(p);
 		p.duration--;
+		System.out.println("Uses left: " + p.duration);
 		return;
 	}
 	synchronized void update(final int interval)
