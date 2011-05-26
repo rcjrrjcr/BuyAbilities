@@ -10,10 +10,10 @@ public final class StorageFactory
 		{
 			return new StorageYaml(origin);
 		}
-		else if (pluginType == Storage.EBEANS)
-		{
-			return new StorageEBeans(origin);
-		}
+//		else if (pluginType == Storage.EBEANS)
+//		{
+//			return new StorageEBeans(origin);
+//		}
 		else
 		{
 			throw new Exception("Unable to create Storage interface.");

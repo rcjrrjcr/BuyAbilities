@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
@@ -17,7 +18,7 @@ public class AbilityManager
 	Map<String,Set<PurchasedAbility>> currentAbilities;
 	BuyAbilities origin;
 	
-	public AbilityManager(BuyAbilities origin)
+    public AbilityManager(BuyAbilities origin)
 	{
 		rentedAbilities = Collections.synchronizedList(new LinkedList<PurchasedAbility>());
 		useCountAbilities = Collections.synchronizedList(new LinkedList<PurchasedAbility>());
@@ -191,37 +192,56 @@ public class AbilityManager
 	}
 	synchronized void update(final int interval)
 	{
-		List<PurchasedAbility> rented = new LinkedList<PurchasedAbility>();
-		List<PurchasedAbility> useCount = new LinkedList<PurchasedAbility>();
 		
-		for(PurchasedAbility p : rentedAbilities)
+		
+        
+		for(ListIterator<PurchasedAbility> rent = rentedAbilities.listIterator();rent.hasNext();)
 		{
+		    PurchasedAbility p = rent.next();
 			if(origin.getServer().getPlayer(p.playerName)!=null&&origin.getServer().getPlayer(p.playerName).isOnline())
 			{
 				p.duration -= interval;
 				if(p.duration <= 0)
 				{
-					currentAbilities.get(p.playerName).remove(p);
-					continue;
-//					rentedAbilities.remove(p);
+			        Set<String> abPerms = p.perms;
+
+			        for(String node : abPerms)
+			        {
+			            if(origin.pHandler.hasPerm(p.world, p.playerName,node))
+			            {
+			                origin.pHandler.removePerm(p.world, p.playerName, node);
+			            }
+			        }
+			        rent.remove();
+			        currentAbilities.get(p.playerName).remove(p);
 				}
 			}
-			rented.add(p);
 		}
-		rentedAbilities = rented;
 		
-		for(PurchasedAbility u : useCountAbilities)
+		for(ListIterator<PurchasedAbility> used = useCountAbilities.listIterator();used.hasNext();)
 		{
+		    PurchasedAbility u = used.next();
 			if(origin.getServer().getPlayer(u.playerName)!=null&&origin.getServer().getPlayer(u.playerName).isOnline())
 			{
 				if(u.duration <= 0)
 				{
-					currentAbilities.get(u.playerName).remove(u);
-					continue;
+				    u.duration -= interval;
+	                if(u.duration <= 0)
+	                {
+	                    Set<String> abPerms = u.perms;
+
+	                    for(String node : abPerms)
+	                    {
+	                        if(origin.pHandler.hasPerm(u.world, u.playerName,node))
+	                        {
+	                            origin.pHandler.removePerm(u.world, u.playerName, node);
+	                        }
+	                    }
+	                    used.remove();
+	                    currentAbilities.get(u.playerName).remove(u);
+	                }
 				}
 			}
-			useCount.add(u);
 		}
-		useCountAbilities = useCount;
 	}
 }
