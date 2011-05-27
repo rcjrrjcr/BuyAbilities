@@ -6,14 +6,17 @@ import java.util.Set;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.bukkit.util.config.Configuration;
 import org.bukkit.util.config.ConfigurationNode;
 
+import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.BABException;
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.BuyAbilities;
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.PurchasedAbility;
 
 public class StorageYaml implements IStorage {
+    private static final Logger log = Logger.getLogger(StorageYaml.class.toString());
 
 	private File yamlFile;
 	private Configuration yamlConfig;
@@ -69,8 +72,8 @@ public class StorageYaml implements IStorage {
 	    Map<String,Set<PurchasedAbility>> playerData = new HashMap<String,Set<PurchasedAbility>>();
 	    for(PurchasedAbility ab : data)
 	    {
-	        if(!playerData.keySet().contains(ab.playerName)) playerData.put(ab.playerName, new HashSet<PurchasedAbility>());
-	        playerData.get(ab.playerName).add(ab);
+	        if(!playerData.keySet().contains(ab.getPlayerName())) playerData.put(ab.getPlayerName(), new HashSet<PurchasedAbility>());
+	        playerData.get(ab.getPlayerName()).add(ab);
 	    }
 	    for(String playerName : playerData.keySet())
 	    {
@@ -89,36 +92,30 @@ public class StorageYaml implements IStorage {
 		for(String world : playerData.keySet())
 		{
 			Map<String, ConfigurationNode> playerWorldData = yamlConfig.getNodes("Data."+playerName+"."+world);
+			log.fine("BuyAbilities: Loading \""+playerName+"\"'s data...");
+			
 			for(String ability : playerWorldData.keySet())
 			{
-				PurchasedAbility pAb = new PurchasedAbility();
-				pAb.abilityName = ability; 
-				pAb.duration = yamlConfig.getInt("Data."+playerName+"."+world+"."+ability+".duration",0);
-				pAb.extName = origin.settings.getInfo(ability).extName;
-				pAb.perms = new HashSet<String>(yamlConfig.getStringList("Data."+playerName+"."+world+"."+ability+".nodes", null));
-				pAb.playerName = playerName;
-				String typeString = yamlConfig.getString("Data."+playerName+"."+world+"."+ability+".type",PurchasedAbilityType.RENT.toString());
+				String yamlBase = "Data."+playerName+"."+world+"."+ability;
 				
-				
-				if(typeString.equalsIgnoreCase(PurchasedAbilityType.BUY.toString()))
-				{
-					pAb.type = PurchasedAbilityType.BUY;
+				try {
+					PurchasedAbility pAb = new PurchasedAbility();
+					pAb.setAbilityName(ability); 
+					pAb.setDuration(yamlConfig.getInt(yamlBase+".duration",0));
+					pAb.setExtName(origin.settings.getInfo(ability).extName);
+//					pAb.setPerms(new HashSet<String>(yamlConfig.getStringList(yamlBase+".nodes", null)));
+					pAb.setPlayerName(playerName);
+					String typeString = yamlConfig.getString(yamlBase+".type",PurchasedAbilityType.RENT.toString());
+	
+					pAb.setType(typeString);
+					pAb.setWorld(world);
+					result.add(pAb);
+				} catch( BABException e ) {
+					log.warning("Exception caught processing node "+yamlBase+" in datafile");
+					e.printStackTrace();
 				}
-				else if (typeString.equalsIgnoreCase(PurchasedAbilityType.RENT.toString()))
-				{
-					pAb.type = PurchasedAbilityType.RENT;
-				}
-				else if (typeString.equalsIgnoreCase(PurchasedAbilityType.USE.toString()))
-				{
-					pAb.type = PurchasedAbilityType.USE;
-				}
-				
-				
-				pAb.world = world;
-				result.add(pAb);
 			}
 		}
-		System.out.println("BuyAbilities: Loading \""+playerName+"\"'s data...");
 		return result;
 	}
 
@@ -130,14 +127,14 @@ public class StorageYaml implements IStorage {
 		if(yamlConfig.getProperty("Data"+playerName)!=null)yamlConfig.removeProperty("Data."+playerName);
 		for(PurchasedAbility pAb : data)
 		{
-			if(!pAb.playerName.equalsIgnoreCase(playerName)) continue;
-			String path = "Data."+pAb.playerName+"."+pAb.world+"."+pAb.abilityName;
-			yamlConfig.setProperty(path+".duration", pAb.duration);
-			yamlConfig.setProperty(path+".type", pAb.type.toString());
-			yamlConfig.setProperty("Data."+pAb.playerName+"."+pAb.world+"."+pAb.abilityName+".nodes", pAb.perms);
+			if(!pAb.getPlayerName().equalsIgnoreCase(playerName)) continue;
+			String path = "Data."+pAb.getPlayerName()+"."+pAb.getWorld()+"."+pAb.getAbilityName();
+			yamlConfig.setProperty(path+".duration", pAb.getDuration());
+			yamlConfig.setProperty(path+".type", pAb.getType().toString());
+			yamlConfig.setProperty(path+".nodes", pAb.getPerms());
 		}
 		yamlConfig.save();
-        System.out.println("BuyAbilities: Player \"" + playerName + "\"'s data saved.");
+        log.fine("BuyAbilities: Player \"" + playerName + "\"'s data saved.");
     }
 
 }

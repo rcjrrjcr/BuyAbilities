@@ -1,12 +1,13 @@
 package com.rcjrrjcr.bukkitplugins.buyabilitiesplugin;
 
+import java.util.logging.Logger;
+
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.server.ServerListener;
 import org.bukkit.plugin.Plugin;
 
 import com.rcjrrjcr.bukkitplugins.util.PluginStruct;
-import com.rcjrrjcr.bukkitplugins.util.economyinterface.EconPlugin;
 import com.rcjrrjcr.bukkitplugins.util.permissionsinterface.PermPlugin;
 
 //import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.EconomicPlugins.EconPlugin;
@@ -18,6 +19,7 @@ import com.rcjrrjcr.bukkitplugins.util.permissionsinterface.PermPlugin;
  * 
  */
 public class BuyAbilitiesServerListener extends ServerListener {
+    private static final Logger log = Logger.getLogger(BuyAbilitiesServerListener.class.toString());
 
     private final BuyAbilities plugin;
     private boolean permActive;
@@ -31,9 +33,9 @@ public class BuyAbilitiesServerListener extends ServerListener {
 
     @Override
     public void onPluginEnable(PluginEnableEvent event) {
-        System.out.println("BuyAbilities: PluginEnabled event detected!");
+        log.fine("BuyAbilities: PluginEnabled event detected!");
         Plugin permPlugin = null;
-        Plugin econPlugin = null;
+//        Plugin econPlugin = null;
 
         if (!permActive) {
             // permPlugin =
@@ -53,7 +55,7 @@ public class BuyAbilitiesServerListener extends ServerListener {
             permPlugin = plugin.getServer().getPluginManager()
                     .getPlugin("Permissions");
             if (permPlugin != null && permPlugin.isEnabled()) {
-                System.out.println("BuyAbilities: Hooking into Permissions.");
+                log.info("BuyAbilities: Hooking into Permissions.");
                 plugin.setPermissions(permPlugin, PermPlugin.PermYeti);
                 permActive = true;
                 return;
@@ -62,6 +64,9 @@ public class BuyAbilitiesServerListener extends ServerListener {
         }
 
         if (!econActive) {
+            plugin.active.setEcon(plugin.hookEcon(event));
+            
+            /*
             econPlugin = plugin.getServer().getPluginManager()
                     .getPlugin("iConomy");
             if (econPlugin != null) {
@@ -92,6 +97,7 @@ public class BuyAbilitiesServerListener extends ServerListener {
                     }
                 }
             }
+            */
         }
 
         return;
@@ -113,7 +119,7 @@ public class BuyAbilitiesServerListener extends ServerListener {
             String name = event.getPlugin().getDescription().getName();
             if (name.equals("iConomy") || name.equals("Essentials")) {
                 try {
-                    plugin.active.setEcon(plugin.hookEcon());
+                    plugin.active.setEcon(plugin.hookEcon(event));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
