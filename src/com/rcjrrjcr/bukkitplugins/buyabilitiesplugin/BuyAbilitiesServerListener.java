@@ -19,7 +19,7 @@ import com.rcjrrjcr.bukkitplugins.util.permissionsinterface.PermPlugin;
  * 
  */
 public class BuyAbilitiesServerListener extends ServerListener {
-    private static final Logger log = Logger.getLogger(BuyAbilitiesServerListener.class.toString());
+    private static final Logger log = BuyAbilities.log;
 
     private final BuyAbilities plugin;
     private boolean permActive;

@@ -16,7 +16,7 @@ import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.BuyAbilities;
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.PurchasedAbility;
 
 public class StorageYaml implements IStorage {
-    private static final Logger log = Logger.getLogger(StorageYaml.class.toString());
+    private static final Logger log = BuyAbilities.log;
 
 	private File yamlFile;
 	private Configuration yamlConfig;

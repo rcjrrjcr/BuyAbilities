@@ -9,6 +9,11 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class BuyAbilitiesPlayerListener extends PlayerListener {
 
+	// use Thread-safe LinkedList Queue for processing commands on a separate thread
+	// TODO: maybe implement this later as a more efficient way to process commands, instead of
+	// 		 creating a new Decrementer() object every time like currently happens.  -morganm
+//	private Queue<PlayerCommandPreprocessEvent> decrementerQueue = new ConcurrentLinkedQueuePlayerCommandPreprocessEvent>();
+	
 	public BuyAbilities origin;
 	
 	public BuyAbilitiesPlayerListener(BuyAbilities origin)

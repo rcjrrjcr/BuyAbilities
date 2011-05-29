@@ -9,10 +9,14 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.logging.Logger;
+
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.PurchasedAbilityType;
 
 public class AbilityManager
 {
+    private static final Logger log = BuyAbilities.log;
+    
 	List<PurchasedAbility> rentedAbilities;
 	List<PurchasedAbility> useCountAbilities;
 	Map<String,Set<PurchasedAbility>> currentAbilities;
@@ -58,6 +62,9 @@ public class AbilityManager
 		Set<String> newPerms = new HashSet<String>();
 		for(String node : abPerms)
 		{
+			// TODO: change to log.fine()
+			log.info("DEBUG: "+p.getWorld()+","+p.getPlayerName()+","+node);
+			
 			if(!origin.pHandler.hasPerm(p.getWorld(), p.getPlayerName(),node))
 			{
 				origin.pHandler.addPerm(p.getWorld(), p.getPlayerName(),node);
@@ -146,7 +153,7 @@ public class AbilityManager
 	}
 	synchronized void loadPlayer(Set<PurchasedAbility> data, String playerName)
 	{
-		System.out.println("Loading player \""+playerName+"\"'s data!");
+		log.info("[BuyAbilities] Loading player \""+playerName+"\"'s data!");
 		if(data == null) return;
 		Set<PurchasedAbility> pAbilities = getPlayer(playerName);
 		if(!pAbilities.isEmpty())
@@ -163,9 +170,10 @@ public class AbilityManager
 		}
 		return;
 	}
+	
 	synchronized Set<PurchasedAbility> saveAndUnloadPlayer(String playerName)
 	{
-		System.out.println("Unloading player \""+playerName+"\"'s data!");
+		log.info("[BuyAbilities] Unloading player \""+playerName+"\"'s data!");
 		Set<PurchasedAbility> pAbilities = getPlayer(playerName);
 		Set<PurchasedAbility> pSaved = new HashSet<PurchasedAbility>(pAbilities.size());
 //		System.out.println(pAbilities);

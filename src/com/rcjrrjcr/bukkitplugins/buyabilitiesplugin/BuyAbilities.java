@@ -1,51 +1,46 @@
 package com.rcjrrjcr.bukkitplugins.buyabilitiesplugin;
 
 import java.io.File;
-//import java.io.IOException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
-//
-//import javax.script.Invocable;
-//import javax.script.ScriptEngine;
-//import javax.script.ScriptEngineFactory;
-//import javax.script.ScriptEngineManager;
-//import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.server.PluginEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
-//import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.scheduler.BukkitScheduler;
 
-import com.rcjrrjcr.bukkitplugins.util.PluginStruct;
-import com.rcjrrjcr.bukkitplugins.util.RcjrPlugin;
-import com.rcjrrjcr.bukkitplugins.util.SearchHelper;
-import com.rcjrrjcr.bukkitplugins.util.economyinterface.EconFactory;
-import com.rcjrrjcr.bukkitplugins.util.economyinterface.EconPlugin;
-import com.rcjrrjcr.bukkitplugins.util.economyinterface.IEconHandler;
-import com.rcjrrjcr.bukkitplugins.util.chathelper.ChatHelper;
-import com.rcjrrjcr.bukkitplugins.util.permissionsinterface.IPermHandler;
-import com.rcjrrjcr.bukkitplugins.util.permissionsinterface.PermFactory;
-import com.rcjrrjcr.bukkitplugins.util.permissionsinterface.PermPlugin;
-
+import com.nijikokun.register.payment.Methods;
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.settings.Ability;
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.settings.Settings;
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.IStorage;
-import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.StorageFactory;
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.Storage;
-//import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.StoredAbility;
-//import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.StringWrapper;
+import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.StorageFactory;
+import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.StoredAbility;
+import com.rcjrrjcr.bukkitplugins.util.PluginStruct;
+import com.rcjrrjcr.bukkitplugins.util.RcjrPlugin;
+import com.rcjrrjcr.bukkitplugins.util.SearchHelper;
+import com.rcjrrjcr.bukkitplugins.util.chathelper.ChatHelper;
+import com.rcjrrjcr.bukkitplugins.util.economyinterface.EconFactory;
+import com.rcjrrjcr.bukkitplugins.util.economyinterface.EconPlugin;
+import com.rcjrrjcr.bukkitplugins.util.economyinterface.IEconHandler;
+import com.rcjrrjcr.bukkitplugins.util.permissionsinterface.IPermHandler;
+import com.rcjrrjcr.bukkitplugins.util.permissionsinterface.PermFactory;
+import com.rcjrrjcr.bukkitplugins.util.permissionsinterface.PermPlugin;
 
 /**
  * BuyAbilities for Bukkit
@@ -53,17 +48,26 @@ import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.Storage;
  * @author rcjrrjcr
  */
 public class BuyAbilities extends RcjrPlugin {
+    public static final Logger log = Logger.getLogger(BuyAbilities.class.toString());
 
     private static final int MISS_COUNT_THRESHOLD = 5;
     private static final int DL_THRESHOLD = 5;
     private static final ChatColor COLOR_CHAT = ChatColor.GOLD;
+    
+    // not fond of static variables and methods, they make the (perhaps false?) assumption
+    // that there's only one copy, instead of enforcing it explicitly via singleton pattern.
+    // However I don't know enough about Bukkit yet to know if multiple instances of a plugin
+    // might be running at any time, and since this is what I've seen other plugins do, I'll
+    // stick with this for now. -morganm
+    private static Server server = null;
+    private static BuyAbilities plugin = null;
+    
     private BuyAbilitiesServerListener serverListener;
     private BuyAbilitiesPlayerListener playerListener;
     private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
     IEconHandler eHandler;
     IStorage storage;
     IPermHandler pHandler;
-    // Logger log;
     PluginManager pm;
     public Settings settings;
     AbilityManager abManager;
@@ -71,6 +75,8 @@ public class BuyAbilities extends RcjrPlugin {
     BuyAbilitiesChecker checker;
     private final Integer checkDelay = 5;
     private final Integer checkInterval = 10;
+    
+    private Methods Methods = new Methods();
 
     /**
      * {@inheritDoc}
@@ -79,6 +85,8 @@ public class BuyAbilities extends RcjrPlugin {
      */
     @Override
     public void onEnable() {
+    	server = getServer();
+    	plugin = this;
 
         pm = getServer().getPluginManager();
         scheduler = getServer().getScheduler();
@@ -91,9 +99,9 @@ public class BuyAbilities extends RcjrPlugin {
 
         PluginDescriptionFile pdfFile = this.getDescription();
         if (!(active.getStatus())) {
-            System.out.println(pdfFile.getName() + " version " + pdfFile.getVersion() + " is inactive.");
+            log.info(pdfFile.getName() + " version " + pdfFile.getVersion() + " is inactive.");
         } else {
-            System.out.println(pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled!");
+        	log.info(pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled!");
         }
         serverListener = new BuyAbilitiesServerListener(this, active);
         playerListener = new BuyAbilitiesPlayerListener(this);
@@ -106,12 +114,12 @@ public class BuyAbilities extends RcjrPlugin {
         }
         // Load data from the database
         abManager = new AbilityManager(this);
-//        try {
-//            abManager.load(storage.getData());
-//        } catch (Exception e) {
-//            System.out.println("Malformed data.yml.");
-//            e.printStackTrace();
-//        }
+        try {
+            abManager.load(storage.getData());
+        } catch (Exception e) {
+            System.out.println("Error reading Abilities data.");
+            e.printStackTrace();
+        }
         // Start the checker thread
         checker = new BuyAbilitiesChecker(this, checkInterval);
         scheduler.scheduleAsyncRepeatingTask(this, checker, checkDelay, checkInterval);
@@ -135,11 +143,11 @@ public class BuyAbilities extends RcjrPlugin {
     @Override
     public void onDisable() {
         scheduler.cancelTasks(this);
-//        try {
-//            storage.writeData(abManager.save());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            storage.writeData(abManager.save());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isDebugging(final Player player) {
@@ -157,20 +165,52 @@ public class BuyAbilities extends RcjrPlugin {
     boolean hookPerm() throws Exception {
         boolean perm = true;
         Plugin permPlugin = null;
-        permPlugin = pm.getPlugin("Permissions");
-        if (permPlugin == null) {
-            throw new Exception("No Permission Plugin found!");
-        } else if (!(permPlugin.isEnabled())) {
-            perm = false;
-            pHandler = PermFactory.getInstance(PermPlugin.CACHE, null, this);
-        } else {
-            pHandler = PermFactory.getInstance(PermPlugin.PermYeti, permPlugin, this);
+        
+        // look for GroupManager first, since it can emulate Permissions, but it's emulated mode
+        // doesn't work with this mod.
+        permPlugin = pm.getPlugin("GroupManager");
+        if (permPlugin != null) {
+        	if( !permPlugin.isEnabled() ) {
+                perm = false;
+                pHandler = PermFactory.getInstance(PermPlugin.CACHE, null, this);
+        	}
+        	else {
+        		pHandler = PermFactory.getInstance(PermPlugin.GroupManager, permPlugin, this);
+        	}
         }
+
+        // if we didn't find GroupManager, then look for Permissions
+        if( permPlugin == null || pHandler == null ) {
+        	permPlugin = pm.getPlugin("Permissions");
+
+        	if (permPlugin == null) {
+        		throw new Exception("No Permission Plugin found!");
+        	} else if (!(permPlugin.isEnabled())) {
+        		perm = false;
+        		pHandler = PermFactory.getInstance(PermPlugin.CACHE, null, this);
+        	} else {
+        		pHandler = PermFactory.getInstance(PermPlugin.PermYeti, permPlugin, this);
+        	}
+        }
+        
         return perm;
     }
 
-    boolean hookEcon() throws Exception {
-        boolean econ = true;
+    boolean hookEcon(PluginEvent event) {
+        boolean econ = false;
+
+        //Economy plugin
+        if(!this.Methods.hasMethod()){
+            if(this.Methods.setMethod(event.getPlugin())){
+            	EconomyManager em = new EconomyManager();
+            	eHandler = em;
+                em.economy = this.Methods.getMethod();
+                System.out.println("[BuyAbilities] " + em.economy.getName() + " version " + em.economy.getVersion() + " loaded.");
+                econ = true;
+            }
+        }
+        
+        /*
         Plugin econPlugin = null;
         econPlugin = pm.getPlugin("iConomy");
         if (econPlugin == null) {
@@ -196,15 +236,18 @@ public class BuyAbilities extends RcjrPlugin {
         } else {
             eHandler = EconFactory.getInstance(EconPlugin.IC4, econPlugin, this);
         }
+        */
+        
         return econ;
     }
 
     PluginStruct hook() throws Exception {
 
-        storage = StorageFactory.getInstance(Storage.YAML, this);
+        storage = StorageFactory.getInstance(Storage.EBEANS, this);
         boolean perm = hookPerm();
-        boolean econ = hookEcon();
-        return new PluginStruct(perm, econ);
+        // Econ is enabled in ENABLE_PLUGIN event now
+//        boolean econ = hookEcon();
+        return new PluginStruct(perm, false);
     }
 
     /**
@@ -215,67 +258,72 @@ public class BuyAbilities extends RcjrPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
         String commandName = command.getName().toLowerCase();
+    	
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            return commandHandler(player, args);
+            if ("buyabilities".equals(commandName) || commandName.equals("buyab") || commandName.equals("bab")) {
+                return commandHandler(player, args);
+            }
         } else {
-            if (args.length == 0) {
-                ChatHelper.sendMsgWrap("Incorrect syntax. Syntax /bab [hasperm|balance|listall].", sender);
-                return true;
-            }
-            if (args[0].equalsIgnoreCase("listall")) {
-                ChatHelper.sendMsgWrap(abManager.currentAbilities.toString(), sender);
-                return true;
-            }
-            if (args[0].equalsIgnoreCase("balance")) {
-                if (args.length != 2) {
-                    ChatHelper.sendMsgWrap("Incorrect syntax. Syntax /bab balance <playername>", sender);
+            if ("buyabilities".equals(commandName) || commandName.equalsIgnoreCase("bab") || commandName.equalsIgnoreCase("buyab")) {
+                if (args.length == 0) {
+                    ChatHelper.sendMsgWrap("Incorrect syntax. Syntax /bab [hasperm|balance|listall].", sender);
                     return true;
                 }
-                Integer bal = balance(args[1]);
-                if (bal == null) {
-                    ChatHelper.sendMsgWrap("Player does not exist.", sender);
+                if (args[0].equalsIgnoreCase("listall")) {
+                    ChatHelper.sendMsgWrap(abManager.currentAbilities.toString(), sender);
                     return true;
                 }
-                ChatHelper.sendMsgWrap("Player's balance:" + bal.toString(), sender);
-                return true;
-            }
-            if (args[0].equalsIgnoreCase("hasperm")) {
-                if (args.length != 4) {
-                    ChatHelper.sendMsgWrap("Incorrect syntax. Syntax /bab hasperm <worldname> <playername> <nodename>", sender);
+                if (args[0].equalsIgnoreCase("balance")) {
+                    if (args.length != 2) {
+                        ChatHelper.sendMsgWrap("Incorrect syntax. Syntax /bab balance <playername>", sender);
+                        return true;
+                    }
+                    Integer bal = balance(args[1]);
+                    if (bal == null) {
+                        ChatHelper.sendMsgWrap("Player does not exist.", sender);
+                        return true;
+                    }
+                    ChatHelper.sendMsgWrap("Player's balance:" + bal.toString(), sender);
                     return true;
                 }
-                Boolean msg = (hasPermission(args[1], args[2], args[3]));
-                if (msg == null) {
-                    ChatHelper.sendMsgWrap("Player or world does not exist.", sender);
+                if (args[0].equalsIgnoreCase("hasperm")) {
+                    if (args.length != 4) {
+                        ChatHelper.sendMsgWrap("Incorrect syntax. Syntax /bab hasperm <worldname> <playername> <nodename>", sender);
+                        return true;
+                    }
+                    Boolean msg = (hasPermission(args[1], args[2], args[3]));
+                    if (msg == null) {
+                        ChatHelper.sendMsgWrap("Player or world does not exist.", sender);
+                        return true;
+                    }
+                    ChatHelper.sendMsgWrap("Does player have permission:" + msg.toString(), sender);
                     return true;
                 }
-                ChatHelper.sendMsgWrap("Does player have permission:" + msg.toString(), sender);
-                return true;
-            }
-            if (args[0].equalsIgnoreCase("commandtest")) {
-                String cmd = commandName + " ";
-                for (int i = 0; i < args.length; i++) {
-                    cmd = cmd + " " + args[i];
-                }
-                ChatHelper.sendMsgWrap(cmd, sender);
-                return true;
-            }
-            if (args[0].equalsIgnoreCase("dldist")) {
-                if (args.length != 3) {
-                    ChatHelper.sendMsgWrap("Incorrect syntax. Syntax /bab dldist <word1> <word2>", sender);
+                if (args[0].equalsIgnoreCase("commandtest")) {
+                    String cmd = commandName + " ";
+                    for (int i = 0; i < args.length; i++) {
+                        cmd = cmd + " " + args[i];
+                    }
+                    ChatHelper.sendMsgWrap(cmd, sender);
                     return true;
                 }
-                ChatHelper.sendMsgWrap(String.valueOf(SearchHelper.damlev(args[1], args[2])), sender);
-                return true;
+                if (args[0].equalsIgnoreCase("dldist")) {
+                    if (args.length != 3) {
+                        ChatHelper.sendMsgWrap("Incorrect syntax. Syntax /bab dldist <word1> <word2>", sender);
+                        return true;
+                    }
+                    ChatHelper.sendMsgWrap(String.valueOf(SearchHelper.damlev(args[1], args[2])), sender);
+                    return true;
+                }
+                if (args[0].equalsIgnoreCase("status")) {
+                    System.out.println("Econ hooked: " + String.valueOf(active.isEconActive()));
+                    System.out.println("Perm hooked: " + String.valueOf(active.isPermActive()));
+                    return true;
+                }
             }
-            if (args[0].equalsIgnoreCase("status")) {
-                System.out.println("Econ hooked: " + String.valueOf(active.isEconActive()));
-                System.out.println("Perm hooked: " + String.valueOf(active.isPermActive()));
-                return true;
-            }
-
         }
+        
         return false;
     }
 
@@ -511,7 +559,7 @@ public class BuyAbilities extends RcjrPlugin {
                 ChatHelper.sendMsgWrap(COLOR_CHAT, "Unable to buy uses of this ability.", player);
                 return true;
             }
-            if (!eHandler.deduct(player, ab.costs.rentCost)) {
+            if (!eHandler.deduct(player, ab.costs.useCost)) {
                 ChatHelper.sendMsgWrap(COLOR_CHAT, "Insufficient funds.", player);
                 return true;
             }
@@ -650,25 +698,37 @@ public class BuyAbilities extends RcjrPlugin {
         return (int) eHandler.getBalance(getServer().getPlayer(playerName));
     }
 
+    /** This is called asynchronously to decrement on-use abilities.  It matches regex's against
+     * the declares regex for those commands and decrements the use count if it finds any matches. 
+     * 
+     * @param cmdLine
+     * @param playerName
+     * @param worldName
+     */
     void commandPreprocess(String cmdLine, String playerName, String worldName) {
-        // System.out.println("commandPreprocess called!");
+//    	Level logLevel = log.getLevel();
+//    	log.setLevel(Level.FINE);
+    	
+        log.fine("commandPreprocess called! cmdLine = "+cmdLine);
         Set<Pattern> rgxs = settings.getAllCmds();
-        // System.out.println(rgxs.toString());
+        log.fine(rgxs.toString());
         Set<Ability> abSet = new HashSet<Ability>();
         for (Pattern rgx : rgxs) {
-            // System.out.println("Checking: "+rgx);
+        	log.fine("Checking: "+rgx);
             if (rgx.matcher(cmdLine).lookingAt()) {
-                // System.out.println("Matched!");
+            	log.fine("Matched!");
                 abSet.addAll(settings.getCmdAbility(rgx));
             }
         }
-        // System.out.println(abSet);
+        
+        log.fine(abSet.toString());
         for (Ability ab : abSet) {
             // System.out.println("World: "+
             // worldName+"Player: "+playerName+"Ability: "+ab.name);
             abManager.decrement(worldName, playerName, ab.name);
         }
-
+        
+//		log.setLevel(logLevel);
     }
 
     void processLogonLogoff(PlayerEvent event) throws Exception {
@@ -691,17 +751,28 @@ public class BuyAbilities extends RcjrPlugin {
         return;
     }
 
-//    public void initDB() {
-//        installDDL();
-//    }
-//
-//    @Override
-//    public List<Class<?>> getDatabaseClasses() {
-//        List<Class<?>> classList = new LinkedList<Class<?>>();
-//        classList.add(StoredAbility.class);
-//        classList.add(StringWrapper.class);
-//        return classList;
-//    }
+    public void initDB() {
+        installDDL();
+    }
+
+    @Override
+    public List<Class<?>> getDatabaseClasses() {
+        List<Class<?>> classList = new LinkedList<Class<?>>();
+        classList.add(StoredAbility.class);
+        return classList;
+    }
+    
+    public static Server getBukkitServer() {
+        return server;
+    }
+    
+    public static BuyAbilities getPlugin() {
+        return plugin;
+    }
+    
+    public Settings getSettings() {
+    	return settings;
+    }
 }
 
 class BuyAbilitiesChecker implements Runnable {

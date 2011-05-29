@@ -1,11 +1,13 @@
 package com.rcjrrjcr.bukkitplugins.buyabilitiesplugin;
 
 //import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.settings.Ability;
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.PurchasedAbilityType;
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.StoredAbility;
+import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.StringSetWrapper;
 
 //TODO: Shift Ebeans annotations to StoredAbility, create String wrapper for ebeans
 
@@ -15,7 +17,7 @@ public class PurchasedAbility implements Comparable<PurchasedAbility>, Cloneable
 
     private String extName;
 
-//    private Set<String> perms;
+    private Set<String> perms;
 
     private String playerName;
 
@@ -44,7 +46,7 @@ public class PurchasedAbility implements Comparable<PurchasedAbility>, Cloneable
     public PurchasedAbility() {
         abilityName = new String();
         extName = new String();
-//        perms = new HashSet<String>();
+        perms = new HashSet<String>();
         playerName = new String();
         world = new String();
         duration = 0;
@@ -53,7 +55,7 @@ public class PurchasedAbility implements Comparable<PurchasedAbility>, Cloneable
     public PurchasedAbility(Ability a, String playerName, String worldName, PurchasedAbilityType type) {
         abilityName = a.name;
         extName = a.info.extName;
-//        perms = a.perms;
+        perms = a.perms;
         this.playerName = playerName;
         this.world = worldName;
         this.type = type;
@@ -67,8 +69,8 @@ public class PurchasedAbility implements Comparable<PurchasedAbility>, Cloneable
     private PurchasedAbility(PurchasedAbility p) {
         this.abilityName = p.abilityName;
         this.extName = p.extName;
-//        this.perms = new HashSet<String>();
-//        this.perms.addAll(p.perms);
+        this.perms = new HashSet<String>();
+        this.perms.addAll(p.perms);
         this.playerName = p.playerName;
         this.world = p.world;
         this.duration = p.duration;
@@ -78,7 +80,8 @@ public class PurchasedAbility implements Comparable<PurchasedAbility>, Cloneable
     public PurchasedAbility(StoredAbility p) {
         this.abilityName = p.getAbilityName();
         this.extName = p.getExtName();
-//        this.perms = new HashSet<String>();
+        this.perms = new HashSet<String>();
+        this.perms = new StringSetWrapper(p.getPerms()).getSet();
 //        this.perms = p.getPerms();
 //        for (StringWrapper wrapped : p.getPerms()) {
 //            this.perms.add(wrapped.getString());
@@ -127,8 +130,8 @@ public class PurchasedAbility implements Comparable<PurchasedAbility>, Cloneable
             return false;
         if (type != p.type)
             return false;
-//        if (!(perms.containsAll(p.perms) && p.perms.containsAll(perms)))
-//            return false;
+        if (!(perms.containsAll(p.perms) && p.perms.containsAll(perms)))
+            return false;
         return true;
     }
 
@@ -171,13 +174,15 @@ public class PurchasedAbility implements Comparable<PurchasedAbility>, Cloneable
 	}
 
 	public Set<String> getPerms() {
-		Ability ability = getAssociatedAbility();
+		return perms;
 		
-		if( ability == null ) {
-			throw new NullPointerException("ability is null");
-		}
-		
-		return ability.perms;
+//		Ability ability = getAssociatedAbility();
+//		
+//		if( ability == null ) {
+//			throw new NullPointerException("ability is null");
+//		}
+//		
+//		return ability.perms;
 	}
 
 	public String getPlayerName() {
@@ -204,9 +209,9 @@ public class PurchasedAbility implements Comparable<PurchasedAbility>, Cloneable
 		this.extName = extName;
 	}
 
-//	public void setPerms(Set<String> perms) {
-//		this.perms = perms;
-//	}
+	public void setPerms(Set<String> perms) {
+		this.perms = perms;
+	}
 
 	public void setPlayerName(String playerName) {
 		this.playerName = playerName;
