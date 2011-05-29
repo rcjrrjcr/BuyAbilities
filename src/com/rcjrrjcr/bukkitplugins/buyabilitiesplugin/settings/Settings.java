@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 //import javax.script.ScriptEngine;
@@ -22,6 +23,8 @@ import com.rcjrrjcr.bukkitplugins.util.SearchHelper;
 //TODO: Add SearchHelper for categories and abilities
 
 public class Settings {
+    private static final Logger log = BuyAbilities.log;
+    
 	private BuyAbilities origin;
 	private File yamlFile; 
 	private Configuration yamlConfig;
@@ -42,8 +45,8 @@ public class Settings {
 		yamlFile = new File(path);
 		if(!(yamlFile.exists()))
 		{
-			System.out.println(path + " not found.");
-			System.out.println("Creating " + path + "...");
+			log.fine(path + " not found.");
+			log.fine("Creating " + path + "...");
 			yamlFile.createNewFile();
 		}
 		if(!(yamlFile.isFile()))
@@ -109,7 +112,7 @@ public class Settings {
 				}
 			}
 			List<String> rgxList = yamlConfig.getStringList("Abilities."+abilityName+".commands",new LinkedList<String>());
-//			System.out.println(rgxList);
+//			log.fine(rgxList);
 			ab.commands = new HashSet<String>(rgxList);
 			for(String regex : rgxList)
 			{

@@ -62,8 +62,7 @@ public class AbilityManager
 		Set<String> newPerms = new HashSet<String>();
 		for(String node : abPerms)
 		{
-			// TODO: change to log.fine()
-			log.info("DEBUG: "+p.getWorld()+","+p.getPlayerName()+","+node);
+			log.fine("BuyAbilities.addPlayerAbility(): "+p.getWorld()+","+p.getPlayerName()+","+node);
 			
 			if(!origin.pHandler.hasPerm(p.getWorld(), p.getPlayerName(),node))
 			{
@@ -153,7 +152,7 @@ public class AbilityManager
 	}
 	synchronized void loadPlayer(Set<PurchasedAbility> data, String playerName)
 	{
-		log.info("[BuyAbilities] Loading player \""+playerName+"\"'s data!");
+		log.fine("[BuyAbilities] Loading player \""+playerName+"\"'s data!");
 		if(data == null) return;
 		Set<PurchasedAbility> pAbilities = getPlayer(playerName);
 		if(!pAbilities.isEmpty())
@@ -173,10 +172,10 @@ public class AbilityManager
 	
 	synchronized Set<PurchasedAbility> saveAndUnloadPlayer(String playerName)
 	{
-		log.info("[BuyAbilities] Unloading player \""+playerName+"\"'s data!");
+		log.fine("[BuyAbilities] Unloading player \""+playerName+"\"'s data!");
 		Set<PurchasedAbility> pAbilities = getPlayer(playerName);
 		Set<PurchasedAbility> pSaved = new HashSet<PurchasedAbility>(pAbilities.size());
-//		System.out.println(pAbilities);
+//		log.fine(pAbilities);
 		if(!pAbilities.isEmpty())
 		{
 			for(PurchasedAbility pAb : pAbilities)
@@ -185,17 +184,17 @@ public class AbilityManager
 				removePlayerAbility(pAb);
 			}
 		}
-//		System.out.println(pSaved);
+//		log.fine(pSaved);
 		return pSaved;
 	}
 	public synchronized void decrement(String worldName, String playerName, String abilityName)
 	{
-//		System.out.println("World: "+ worldName+" Player: "+playerName+" Ability: "+abilityName);
+//		log.fine("World: "+ worldName+" Player: "+playerName+" Ability: "+abilityName);
 		PurchasedAbility p = getPlayerAbility(worldName,playerName,abilityName);
 		if(p==null) return;
-//		System.out.println(p);
+//		log.fine(p);
 		p.setDuration( p.getDuration() - 1 );
-		System.out.println("Uses left: " + p.getDuration());
+		log.fine("Uses left: " + p.getDuration());
 		return;
 	}
 	

@@ -3,6 +3,7 @@ package com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
@@ -11,6 +12,8 @@ import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.BuyAbilities;
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.PurchasedAbility;
 
 public class StorageEBeans implements IStorage {
+    private static final Logger log = BuyAbilities.log;
+    
     private final BuyAbilities origin;
 
     public StorageEBeans(BuyAbilities plugin) {
@@ -26,7 +29,7 @@ public class StorageEBeans implements IStorage {
 //        	System.out.println("Caught exception:");
 //        	ex.printStackTrace();
         	
-            System.out.println("Installing database for "
+            log.info("Installing database for "
                     + origin.getDescription().getName()
                     + " due to first time usage");
             origin.initDB();

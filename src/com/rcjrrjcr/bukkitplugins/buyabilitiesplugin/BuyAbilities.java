@@ -49,6 +49,12 @@ import com.rcjrrjcr.bukkitplugins.util.permissionsinterface.PermPlugin;
  */
 public class BuyAbilities extends RcjrPlugin {
     public static final Logger log = Logger.getLogger(BuyAbilities.class.toString());
+    
+    /* for local debugging
+    static {
+    	log.setLevel(java.util.logging.Level.FINE);
+    }
+    */
 
     private static final int MISS_COUNT_THRESHOLD = 5;
     private static final int DL_THRESHOLD = 5;
@@ -205,7 +211,7 @@ public class BuyAbilities extends RcjrPlugin {
             	EconomyManager em = new EconomyManager();
             	eHandler = em;
                 em.economy = this.Methods.getMethod();
-                System.out.println("[BuyAbilities] " + em.economy.getName() + " version " + em.economy.getVersion() + " loaded.");
+                log.info("[BuyAbilities] " + em.economy.getName() + " version " + em.economy.getVersion() + " loaded.");
                 econ = true;
             }
         }
@@ -317,8 +323,8 @@ public class BuyAbilities extends RcjrPlugin {
                     return true;
                 }
                 if (args[0].equalsIgnoreCase("status")) {
-                    System.out.println("Econ hooked: " + String.valueOf(active.isEconActive()));
-                    System.out.println("Perm hooked: " + String.valueOf(active.isPermActive()));
+                    log.info("Econ hooked: " + String.valueOf(active.isEconActive()));
+                    log.info("Perm hooked: " + String.valueOf(active.isPermActive()));
                     return true;
                 }
             }
@@ -628,7 +634,7 @@ public class BuyAbilities extends RcjrPlugin {
             ChatHelper.sendMsgWrap(COLOR_CHAT, ab.info.help, player);
             return true;
         } else {
-            ChatHelper.sendMsgWrap(COLOR_CHAT, "Incorrect syntax. Syntax /bab [categories|category|page|current|buy|rent|info|help].", player);
+            ChatHelper.sendMsgWrap(COLOR_CHAT, "Incorrect syntax. Syntax /bab [categories|category|page|current|buy|rent|rentuse|info|help].", player);
             return true;
         }
     }
@@ -647,13 +653,13 @@ public class BuyAbilities extends RcjrPlugin {
                 e.printStackTrace();
                 return;
             }
-            System.out.println("BuyAbilities: Permissions hooked!");
+            log.info("BuyAbilities: Permissions hooked!");
             active.setPerm(true);
             if (active.getStatus())
-                System.out.println("BuyAbilities: BuyAbilities active.");
+                log.info("BuyAbilities: BuyAbilities active.");
         }
         if (!active.getStatus())
-            System.out.println("BuyAbilities: BuyAbilities inactive.");
+            log.info("BuyAbilities: BuyAbilities inactive.");
     }
 
     void setEconomy(Plugin econPlugin, EconPlugin type) {
@@ -664,27 +670,27 @@ public class BuyAbilities extends RcjrPlugin {
                 e.printStackTrace();
                 return;
             }
-            System.out.println("BuyAbilities: Economy hooked!");
+            log.info("BuyAbilities: Economy hooked!");
             active.setEcon(true);
             if (active.getStatus())
-                System.out.println("BuyAbilities: BuyAbilities active.");
+                log.info("BuyAbilities: BuyAbilities active.");
         }
         if (!active.getStatus())
-            System.out.println("BuyAbilities: BuyAbilities inactive.");
+            log.info("BuyAbilities: BuyAbilities inactive.");
     }
 
     public Boolean hasPermission(String world, String playerName, String perm) {
         if (world == null || playerName == null || perm == null) {
-            System.out.println("Arguments are null!");
+            log.warning("Arguments are null!");
             return false;
         }
         if (getServer().getWorld(world) == null) {
 
-            System.out.println("World does not exist!");
+            log.warning("World does not exist!");
             return false;
         }
         if (getServer().getPlayer(playerName) == null) {
-            System.out.println("Player not online!");
+            log.warning("Player not online!");
             return false;
         }
         return pHandler.hasPerm(world, playerName, perm);

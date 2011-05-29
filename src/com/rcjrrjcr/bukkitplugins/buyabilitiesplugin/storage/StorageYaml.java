@@ -29,8 +29,8 @@ public class StorageYaml implements IStorage {
 		yamlFile = new File(path);
 		if(!(yamlFile.exists()))
 		{
-			System.out.println(path + " not found.");
-			System.out.println("Creating " + path + "...");
+			log.fine(path + " not found.");
+			log.fine("Creating " + path + "...");
 			yamlFile.createNewFile();
 		}
 		if(!(yamlFile.isFile()))
@@ -55,7 +55,7 @@ public class StorageYaml implements IStorage {
 		Set<PurchasedAbility> result = new HashSet<PurchasedAbility>();
 		if(data == null||data.isEmpty())
 		{
-			System.out.println("BuyAbilities: Node \"Data:\" empty!");
+			log.fine("BuyAbilities: Node \"Data:\" empty!");
 			return result;
 		}
 		for(String playerName : data.keySet())
