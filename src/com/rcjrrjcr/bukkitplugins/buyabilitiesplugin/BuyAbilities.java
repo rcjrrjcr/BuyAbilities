@@ -112,12 +112,8 @@ public class BuyAbilities extends RcjrPlugin {
         serverListener = new BuyAbilitiesServerListener(this, active);
         playerListener = new BuyAbilitiesPlayerListener(this);
 
-        try {
-            settings = new Settings(this, "plugins" + File.separator + "BuyAbilities" + File.separator + "costs.yml");
-        } catch (Exception e) {
-            e.printStackTrace();
-            pm.disablePlugin(this);
-        }
+        loadSettings();
+        
         // Load data from the database
         abManager = new AbilityManager(this);
         try {
@@ -126,6 +122,7 @@ public class BuyAbilities extends RcjrPlugin {
             System.out.println("Error reading Abilities data.");
             e.printStackTrace();
         }
+        
         // Start the checker thread
         checker = new BuyAbilitiesChecker(this, checkInterval);
         scheduler.scheduleAsyncRepeatingTask(this, checker, checkDelay, checkInterval);
@@ -138,6 +135,18 @@ public class BuyAbilities extends RcjrPlugin {
         getServer().getPluginManager().registerEvent(Type.PLAYER_JOIN, playerListener, Priority.Monitor, this);
         getServer().getPluginManager().registerEvent(Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
         getServer().getPluginManager().registerEvent(Type.PLAYER_KICK, playerListener, Priority.Monitor, this);
+    }
+    
+    private void loadSettings()
+    {
+    	if( settings != null )
+    		log.info("[BuyAbilities] Reloading settings");
+        try {
+            settings = new Settings(this, "plugins" + File.separator + "BuyAbilities" + File.separator + "costs.yml");
+        } catch (Exception e) {
+            e.printStackTrace();
+            pm.disablePlugin(this);
+        }
     }
 
     /**
@@ -276,11 +285,11 @@ public class BuyAbilities extends RcjrPlugin {
                     ChatHelper.sendMsgWrap("Incorrect syntax. Syntax /bab [hasperm|balance|listall].", sender);
                     return true;
                 }
-                if (args[0].equalsIgnoreCase("listall")) {
+                else if (args[0].equalsIgnoreCase("listall")) {
                     ChatHelper.sendMsgWrap(abManager.currentAbilities.toString(), sender);
                     return true;
                 }
-                if (args[0].equalsIgnoreCase("balance")) {
+                else if (args[0].equalsIgnoreCase("balance")) {
                     if (args.length != 2) {
                         ChatHelper.sendMsgWrap("Incorrect syntax. Syntax /bab balance <playername>", sender);
                         return true;
@@ -293,7 +302,7 @@ public class BuyAbilities extends RcjrPlugin {
                     ChatHelper.sendMsgWrap("Player's balance:" + bal.toString(), sender);
                     return true;
                 }
-                if (args[0].equalsIgnoreCase("hasperm")) {
+                else if (args[0].equalsIgnoreCase("hasperm")) {
                     if (args.length != 4) {
                         ChatHelper.sendMsgWrap("Incorrect syntax. Syntax /bab hasperm <worldname> <playername> <nodename>", sender);
                         return true;
@@ -306,7 +315,7 @@ public class BuyAbilities extends RcjrPlugin {
                     ChatHelper.sendMsgWrap("Does player have permission:" + msg.toString(), sender);
                     return true;
                 }
-                if (args[0].equalsIgnoreCase("commandtest")) {
+                else if (args[0].equalsIgnoreCase("commandtest")) {
                     String cmd = commandName + " ";
                     for (int i = 0; i < args.length; i++) {
                         cmd = cmd + " " + args[i];
@@ -314,7 +323,7 @@ public class BuyAbilities extends RcjrPlugin {
                     ChatHelper.sendMsgWrap(cmd, sender);
                     return true;
                 }
-                if (args[0].equalsIgnoreCase("dldist")) {
+                else if (args[0].equalsIgnoreCase("dldist")) {
                     if (args.length != 3) {
                         ChatHelper.sendMsgWrap("Incorrect syntax. Syntax /bab dldist <word1> <word2>", sender);
                         return true;
@@ -322,9 +331,13 @@ public class BuyAbilities extends RcjrPlugin {
                     ChatHelper.sendMsgWrap(String.valueOf(SearchHelper.damlev(args[1], args[2])), sender);
                     return true;
                 }
-                if (args[0].equalsIgnoreCase("status")) {
+                else if (args[0].equalsIgnoreCase("status")) {
                     log.info("Econ hooked: " + String.valueOf(active.isEconActive()));
                     log.info("Perm hooked: " + String.valueOf(active.isPermActive()));
+                    return true;
+                }
+                else if (args[0].equalsIgnoreCase("reload")) {
+                    loadSettings();
                     return true;
                 }
             }
@@ -633,6 +646,15 @@ public class BuyAbilities extends RcjrPlugin {
             }
             ChatHelper.sendMsgWrap(COLOR_CHAT, ab.info.help, player);
             return true;
+        } else if (args[0].equalsIgnoreCase("reload")) {
+            if (!pHandler.hasPerm(player.getWorld().getName(), player.getName(), "buyabilities.admin.reload")) {
+                ChatHelper.sendMsgWrap(COLOR_CHAT, "You do not have permission to use this command.", player);
+            }
+            else {
+            	loadSettings();
+                ChatHelper.sendMsgWrap(COLOR_CHAT, "BuyAbilities settings reloaded.", player);
+            }
+        	return true;
         } else {
             ChatHelper.sendMsgWrap(COLOR_CHAT, "Incorrect syntax. Syntax /bab [categories|category|page|current|buy|rent|rentuse|info|help].", player);
             return true;
