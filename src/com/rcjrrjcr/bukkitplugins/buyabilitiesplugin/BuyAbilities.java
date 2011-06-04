@@ -608,14 +608,21 @@ public class BuyAbilities extends RcjrPlugin {
                 }
                 return true;
             }
+
+            // changed to use StringBuffer, much more efficient. Also fixed bug with dangling "/"
+            // on end of list. -morganm 6/3/11
             String catString = "";
+            StringBuffer sb = new StringBuffer();
             Set<String> catSet = ab.categories;
             if (catSet != null && !catSet.isEmpty()) {
                 catString = ": Categories ";
                 for (String category : catSet) {
-                    catString = catString + category + "/";
+                	if(sb.length() > 0 ) {
+                		sb.append("/");
+                	}
+                	sb.append(category);
                 }
-                catString.substring(0, catString.length());
+                catString = ": Categories " + sb.toString();
             }
             ChatHelper.sendMsgWrap(COLOR_CHAT, ab.name + " categories " + catString, player);
             ChatHelper.sendMsgWrap(COLOR_CHAT, ab.info.desc, player);

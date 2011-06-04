@@ -2,6 +2,7 @@ package com.rcjrrjcr.bukkitplugins.buyabilitiesplugin;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,7 +34,7 @@ public class AbilityManager
     
 	public synchronized Set<PurchasedAbility> getPlayer(String playerName)
 	{
-		if(currentAbilities.get(playerName)==null) currentAbilities.put(playerName, new HashSet<PurchasedAbility>());
+		if(currentAbilities.get(playerName)==null) currentAbilities.put(playerName, Collections.synchronizedSet(new HashSet<PurchasedAbility>()));
 		return currentAbilities.get(playerName);
 	}
 	
@@ -62,7 +63,7 @@ public class AbilityManager
 		Set<String> newPerms = new HashSet<String>();
 		for(String node : abPerms)
 		{
-			log.fine("BuyAbilities.addPlayerAbility(): "+p.getWorld()+","+p.getPlayerName()+","+node);
+			log.info("BuyAbilities.addPlayerAbility(): world: "+p.getWorld()+", player: "+p.getPlayerName()+", node:"+node);
 			
 			if(!origin.pHandler.hasPerm(p.getWorld(), p.getPlayerName(),node))
 			{
@@ -77,7 +78,7 @@ public class AbilityManager
 //		p.setPerms(newPerms);
 		if(p.getType() == PurchasedAbilityType.RENT) rentedAbilities.add(p);
 		if(p.getType() == PurchasedAbilityType.USE) useCountAbilities.add(p);
-		if(currentAbilities.get(p.getPlayerName()) == null) currentAbilities.put(p.getPlayerName(), new HashSet<PurchasedAbility>());
+		if(currentAbilities.get(p.getPlayerName()) == null) currentAbilities.put(p.getPlayerName(), Collections.synchronizedSet(new HashSet<PurchasedAbility>()));
 		currentAbilities.get(p.getPlayerName()).add(p);
 	}
 	
@@ -108,10 +109,10 @@ public class AbilityManager
 	{
 		PurchasedAbility p = getPlayerAbility(worldName,playerName,abilityName);
 		if(p == null) return;
-		removePlayerAbility(p);
-		
+		removePlayerAbility(p, false);
 	}
-	private synchronized void removePlayerAbility(PurchasedAbility p)
+
+	private synchronized void removePlayerAbility(PurchasedAbility p, boolean noModifyCurrentAbilitiesMap)
 	{
 		if(p == null) return;
 		Set<String> abPerms = p.getPerms();
@@ -125,7 +126,9 @@ public class AbilityManager
 		}
 		if(p.getType() == PurchasedAbilityType.RENT) rentedAbilities.remove(p);
 		if(p.getType() == PurchasedAbilityType.USE) useCountAbilities.remove(p);
-		currentAbilities.get(p.getPlayerName()).remove(p);
+		
+		if( !noModifyCurrentAbilitiesMap )
+			currentAbilities.get(p.getPlayerName()).remove(p);
 	}
 	
 	synchronized void load(Set<PurchasedAbility> data)
@@ -155,11 +158,14 @@ public class AbilityManager
 		log.fine("[BuyAbilities] Loading player \""+playerName+"\"'s data!");
 		if(data == null) return;
 		Set<PurchasedAbility> pAbilities = getPlayer(playerName);
-		if(!pAbilities.isEmpty())
+		if(pAbilities != null && !pAbilities.isEmpty())
 		{
-			for(PurchasedAbility pAb : pAbilities)
-			{
-				removePlayerAbility(pAb);
+			synchronized(pAbilities) {
+				for(Iterator<PurchasedAbility> i = pAbilities.iterator(); i.hasNext();) {
+					PurchasedAbility pAb = i.next();
+					removePlayerAbility(pAb, true);
+					i.remove();
+				}
 			}
 		}
 		
@@ -176,14 +182,19 @@ public class AbilityManager
 		Set<PurchasedAbility> pAbilities = getPlayer(playerName);
 		Set<PurchasedAbility> pSaved = new HashSet<PurchasedAbility>(pAbilities.size());
 //		log.fine(pAbilities);
-		if(!pAbilities.isEmpty())
+		if(pAbilities != null && !pAbilities.isEmpty())
 		{
-			for(PurchasedAbility pAb : pAbilities)
-			{
-				pSaved.add((PurchasedAbility) pAb.clone());
-				removePlayerAbility(pAb);
+			synchronized(pAbilities) {
+				for(Iterator<PurchasedAbility> i = pAbilities.iterator(); i.hasNext();) {
+					PurchasedAbility pAb = i.next();
+					
+					pSaved.add((PurchasedAbility) pAb.clone());
+					removePlayerAbility(pAb, true);
+					i.remove();
+				}
 			}
 		}
+		
 //		log.fine(pSaved);
 		return pSaved;
 	}

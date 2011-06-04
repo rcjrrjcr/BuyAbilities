@@ -67,15 +67,31 @@ public class StorageEBeans implements IStorage {
         return convertSetFromDB(origin.getDatabase().find(StoredAbility.class).findSet());
     }
 
+    /**
+     * This method is only called during onDisable() and for some reason the implementation
+     * here is causing it to wipe abilities that are already safely in the DB. Further, for
+     * some reason the logging events are being suppressed on shutdown, so I can't get any
+     * debug info.
+     * 
+     * So for now I'm turning this off, since all abilities are committed the moment they
+     * are purchased, so this is redundant at best (if it was working).  -morganm 6/3/11
+     */
     @Override
     public void writeData(Set<PurchasedAbility> data) throws IOException {
+    	/*
     	Set<StoredAbility> sas = convertSetToDB(data);
+    	log.fine("writeData: original data size = "+data.size()+", Storage set size = "+sas.size());
     	
         EbeanServer server = origin.getDatabase();
         server.beginTransaction();
         server.delete(origin.getDatabase().find(StoredAbility.class).findSet());
         server.save(sas);
         server.commitTransaction();
+        */
+    	
+    	// just to be safe and make sure we blow up rather than fail silently if this is called
+    	// elsewhere, lets throw an Exception so we'll find the bug right away.
+    	throw new UnsupportedOperationException("This method not implemented");
     }
 
     @Override
