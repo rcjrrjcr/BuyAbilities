@@ -1,0 +1,15 @@
+v0.9.2 - morganm
+  * fixed issue with abilities not persisting across plugin restarts & server reboots
+  * fixed "ConcurrentModificationException" issues, reported by @Joy
+  * fixed dangling "Categories: /" issue on "/bab info", reported by @Joy
+  * added debug message to try to narrow down what's happening with mixed case names and Permissions
+v0.9.1 - morganm
+  * added live reload capability via "/bab reload", available via permission 'buyabilities.admin.reload'
+v0.9.0 - morganm
+  * integrated Nijikokun's Register module (iConomy5 support)
+  * bukkit ebean support for serializing user data
+  * fixes to support Essentials 2.2.18+
+  * other bug fixes
+  * debug messages cleanup (converted to Logger log.fine())
+v0.8.9 - rcjrrjcr
+  * unknown ChangeLog history before this

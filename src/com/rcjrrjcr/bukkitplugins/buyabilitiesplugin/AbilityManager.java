@@ -2,6 +2,7 @@ package com.rcjrrjcr.bukkitplugins.buyabilitiesplugin;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,10 +10,14 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.logging.Logger;
+
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.PurchasedAbilityType;
 
 public class AbilityManager
 {
+    private static final Logger log = BuyAbilities.log;
+    
 	List<PurchasedAbility> rentedAbilities;
 	List<PurchasedAbility> useCountAbilities;
 	Map<String,Set<PurchasedAbility>> currentAbilities;
@@ -26,10 +31,10 @@ public class AbilityManager
 		this.origin = origin;
 		return;
 	}
-	
+    
 	public synchronized Set<PurchasedAbility> getPlayer(String playerName)
 	{
-		if(currentAbilities.get(playerName)==null) currentAbilities.put(playerName, new HashSet<PurchasedAbility>());
+		if(currentAbilities.get(playerName)==null) currentAbilities.put(playerName, Collections.synchronizedSet(new HashSet<PurchasedAbility>()));
 		return currentAbilities.get(playerName);
 	}
 	
@@ -38,7 +43,7 @@ public class AbilityManager
 		Set<PurchasedAbility> playerCurrent = getPlayer(playerName);
 		for(PurchasedAbility p : playerCurrent)
 		{
-			if(p.abilityName.equalsIgnoreCase(abilityName)&&p.world.equalsIgnoreCase(worldName))
+			if(p.getAbilityName().equalsIgnoreCase(abilityName) && p.getWorld().equalsIgnoreCase(worldName))
 			{
 				return p;
 			}
@@ -54,13 +59,15 @@ public class AbilityManager
 	
 	private synchronized void addPlayerAbility(PurchasedAbility p, boolean load)
 	{
-		Set<String> abPerms = p.perms; 
+		Set<String> abPerms = p.getPerms(); 
 		Set<String> newPerms = new HashSet<String>();
 		for(String node : abPerms)
 		{
-			if(!origin.pHandler.hasPerm(p.world, p.playerName,node))
+			log.info("BuyAbilities.addPlayerAbility(): world: "+p.getWorld()+", player: "+p.getPlayerName()+", node:"+node);
+			
+			if(!origin.pHandler.hasPerm(p.getWorld(), p.getPlayerName(),node))
 			{
-				origin.pHandler.addPerm(p.world, p.playerName, node);
+				origin.pHandler.addPerm(p.getWorld(), p.getPlayerName(),node);
                 newPerms.add(node);
 			}
 			else if(load)
@@ -68,11 +75,11 @@ public class AbilityManager
                 newPerms.add(node);
 			}
 		}
-		p.perms = newPerms;
-		if(p.type == PurchasedAbilityType.RENT) rentedAbilities.add(p);
-		if(p.type == PurchasedAbilityType.USE) useCountAbilities.add(p);
-		if(currentAbilities.get(p.playerName) == null) currentAbilities.put(p.playerName, new HashSet<PurchasedAbility>());
-		currentAbilities.get(p.playerName).add(p);
+//		p.setPerms(newPerms);
+		if(p.getType() == PurchasedAbilityType.RENT) rentedAbilities.add(p);
+		if(p.getType() == PurchasedAbilityType.USE) useCountAbilities.add(p);
+		if(currentAbilities.get(p.getPlayerName()) == null) currentAbilities.put(p.getPlayerName(), Collections.synchronizedSet(new HashSet<PurchasedAbility>()));
+		currentAbilities.get(p.getPlayerName()).add(p);
 	}
 	
 	public boolean hasPermission(String worldName, String playerName, String nodeName)
@@ -102,24 +109,26 @@ public class AbilityManager
 	{
 		PurchasedAbility p = getPlayerAbility(worldName,playerName,abilityName);
 		if(p == null) return;
-		removePlayerAbility(p);
-		
+		removePlayerAbility(p, false);
 	}
-	private synchronized void removePlayerAbility(PurchasedAbility p)
+
+	private synchronized void removePlayerAbility(PurchasedAbility p, boolean noModifyCurrentAbilitiesMap)
 	{
 		if(p == null) return;
-		Set<String> abPerms = p.perms;
+		Set<String> abPerms = p.getPerms();
 
 		for(String node : abPerms)
 		{
-			if(origin.pHandler.hasPerm(p.world, p.playerName,node))
+			if(origin.pHandler.hasPerm(p.getWorld(), p.getPlayerName(),node))
 			{
-				origin.pHandler.removePerm(p.world, p.playerName, node);
+				origin.pHandler.removePerm(p.getWorld(), p.getPlayerName(), node);
 			}
 		}
-		if(p.type == PurchasedAbilityType.RENT) rentedAbilities.remove(p);
-		if(p.type == PurchasedAbilityType.USE) useCountAbilities.remove(p);
-		currentAbilities.get(p.playerName).remove(p);
+		if(p.getType() == PurchasedAbilityType.RENT) rentedAbilities.remove(p);
+		if(p.getType() == PurchasedAbilityType.USE) useCountAbilities.remove(p);
+		
+		if( !noModifyCurrentAbilitiesMap )
+			currentAbilities.get(p.getPlayerName()).remove(p);
 	}
 	
 	synchronized void load(Set<PurchasedAbility> data)
@@ -129,8 +138,8 @@ public class AbilityManager
 		currentAbilities.clear();
 		for(PurchasedAbility p : data)
 		{
-			if(p.perms==null) continue;
-			if(p.perms.isEmpty()) continue;
+			if(p.getPerms()==null) continue;
+			if(p.getPerms().isEmpty()) continue;
 			addPlayerAbility(p,true);
 		}
 	}
@@ -146,50 +155,60 @@ public class AbilityManager
 	}
 	synchronized void loadPlayer(Set<PurchasedAbility> data, String playerName)
 	{
-		System.out.println("Loading player \""+playerName+"\"'s data!");
+		log.fine("[BuyAbilities] Loading player \""+playerName+"\"'s data!");
 		if(data == null) return;
 		Set<PurchasedAbility> pAbilities = getPlayer(playerName);
-		if(!pAbilities.isEmpty())
+		if(pAbilities != null && !pAbilities.isEmpty())
 		{
-			for(PurchasedAbility pAb : pAbilities)
-			{
-				removePlayerAbility(pAb);
+			synchronized(pAbilities) {
+				for(Iterator<PurchasedAbility> i = pAbilities.iterator(); i.hasNext();) {
+					PurchasedAbility pAb = i.next();
+					removePlayerAbility(pAb, true);
+					i.remove();
+				}
 			}
 		}
 		
 		for(PurchasedAbility nAb : data)
 		{
-			if(nAb.playerName.equalsIgnoreCase(playerName)) addPlayerAbility(nAb,true);
+			if(nAb.getPlayerName().equalsIgnoreCase(playerName)) addPlayerAbility(nAb,true);
 		}
 		return;
 	}
+	
 	synchronized Set<PurchasedAbility> saveAndUnloadPlayer(String playerName)
 	{
-		System.out.println("Unloading player \""+playerName+"\"'s data!");
+		log.fine("[BuyAbilities] Unloading player \""+playerName+"\"'s data!");
 		Set<PurchasedAbility> pAbilities = getPlayer(playerName);
 		Set<PurchasedAbility> pSaved = new HashSet<PurchasedAbility>(pAbilities.size());
-//		System.out.println(pAbilities);
-		if(!pAbilities.isEmpty())
+//		log.fine(pAbilities);
+		if(pAbilities != null && !pAbilities.isEmpty())
 		{
-			for(PurchasedAbility pAb : pAbilities)
-			{
-				pSaved.add((PurchasedAbility) pAb.clone());
-				removePlayerAbility(pAb);
+			synchronized(pAbilities) {
+				for(Iterator<PurchasedAbility> i = pAbilities.iterator(); i.hasNext();) {
+					PurchasedAbility pAb = i.next();
+					
+					pSaved.add((PurchasedAbility) pAb.clone());
+					removePlayerAbility(pAb, true);
+					i.remove();
+				}
 			}
 		}
-//		System.out.println(pSaved);
+		
+//		log.fine(pSaved);
 		return pSaved;
 	}
 	public synchronized void decrement(String worldName, String playerName, String abilityName)
 	{
-//		System.out.println("World: "+ worldName+" Player: "+playerName+" Ability: "+abilityName);
+//		log.fine("World: "+ worldName+" Player: "+playerName+" Ability: "+abilityName);
 		PurchasedAbility p = getPlayerAbility(worldName,playerName,abilityName);
 		if(p==null) return;
-//		System.out.println(p);
-		p.duration--;
-		System.out.println("Uses left: " + p.duration);
+//		log.fine(p);
+		p.setDuration( p.getDuration() - 1 );
+		log.fine("Uses left: " + p.getDuration());
 		return;
 	}
+	
 	synchronized void update(final int interval)
 	{
 		
@@ -198,22 +217,24 @@ public class AbilityManager
 		for(ListIterator<PurchasedAbility> rent = rentedAbilities.listIterator();rent.hasNext();)
 		{
 		    PurchasedAbility p = rent.next();
-			if(origin.getServer().getPlayer(p.playerName)!=null&&origin.getServer().getPlayer(p.playerName).isOnline())
+			if(origin.getServer().getPlayer(p.getPlayerName())!=null&&origin.getServer().getPlayer(p.getPlayerName()).isOnline())
 			{
-				p.duration -= interval;
-				if(p.duration <= 0)
+				int duration = p.getDuration();
+				duration -= interval;
+				p.setDuration(duration);
+				if(duration <= 0)
 				{
-			        Set<String> abPerms = p.perms;
+			        Set<String> abPerms = p.getPerms();
 
 			        for(String node : abPerms)
 			        {
-			            if(origin.pHandler.hasPerm(p.world, p.playerName,node))
+			            if(origin.pHandler.hasPerm(p.getWorld(), p.getPlayerName(),node))
 			            {
-			                origin.pHandler.removePerm(p.world, p.playerName, node);
+			                origin.pHandler.removePerm(p.getWorld(), p.getPlayerName(), node);
 			            }
 			        }
 			        rent.remove();
-			        currentAbilities.get(p.playerName).remove(p);
+			        currentAbilities.get(p.getPlayerName()).remove(p);
 				}
 			}
 		}
@@ -221,24 +242,29 @@ public class AbilityManager
 		for(ListIterator<PurchasedAbility> used = useCountAbilities.listIterator();used.hasNext();)
 		{
 		    PurchasedAbility u = used.next();
-			if(origin.getServer().getPlayer(u.playerName)!=null&&origin.getServer().getPlayer(u.playerName).isOnline())
+			if(origin.getServer().getPlayer(u.getPlayerName())!=null&&origin.getServer().getPlayer(u.getPlayerName()).isOnline())
 			{
-				if(u.duration <= 0)
+				int duration = u.getDuration();
+				
+				// is this a bug? we are double-checking if duration <= 0, seems one of these should be
+				// looking for >= 0    -morganm 5/26/11
+				if(duration <= 0)
 				{
-				    u.duration -= interval;
-	                if(u.duration <= 0)
+				    duration -= interval;
+				    u.setDuration(duration);
+	                if(duration <= 0)
 	                {
-	                    Set<String> abPerms = u.perms;
+	                    Set<String> abPerms = u.getPerms();
 
 	                    for(String node : abPerms)
 	                    {
-	                        if(origin.pHandler.hasPerm(u.world, u.playerName,node))
+	                        if(origin.pHandler.hasPerm(u.getWorld(), u.getPlayerName(),node))
 	                        {
-	                            origin.pHandler.removePerm(u.world, u.playerName, node);
+	                            origin.pHandler.removePerm(u.getWorld(), u.getPlayerName(), node);
 	                        }
 	                    }
 	                    used.remove();
-	                    currentAbilities.get(u.playerName).remove(u);
+	                    currentAbilities.get(u.getPlayerName()).remove(u);
 	                }
 				}
 			}

@@ -1,9 +1,9 @@
 name: BuyAbilities
-version: 0.8.9
+version: 0.9.2
 main: com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.BuyAbilities
 description: Allows the purchase of temporary abilities with iConomy money.
-database: false
-author: rcjrrjcr
+database: true
+author: rcjrrjcr,morganm
 commands: 
     buyabilities: 
         aliases:

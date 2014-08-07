@@ -2,31 +2,30 @@ package com.rcjrrjcr.bukkitplugins.buyabilitiesplugin;
 
 //import java.util.ArrayList;
 import java.util.HashSet;
-//import java.util.List;
 import java.util.Set;
 
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.settings.Ability;
 import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.PurchasedAbilityType;
-//import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.StoredAbility;
-//import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.StringWrapper;
+import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.StoredAbility;
+import com.rcjrrjcr.bukkitplugins.buyabilitiesplugin.storage.StringSetWrapper;
 
 //TODO: Shift Ebeans annotations to StoredAbility, create String wrapper for ebeans
 
 public class PurchasedAbility implements Comparable<PurchasedAbility>, Cloneable {
 
-    public String abilityName;
+    private String abilityName;
 
-    public String extName;
+    private String extName;
 
-    public Set<String> perms;
+    private Set<String> perms;
 
-    public String playerName;
+    private String playerName;
 
-    public String world;
+    private String world;
 
-    public PurchasedAbilityType type;
+    private PurchasedAbilityType type;
 
-    public int duration;
+    private int duration;
 
     @Override
     public int compareTo(PurchasedAbility o) {
@@ -78,21 +77,24 @@ public class PurchasedAbility implements Comparable<PurchasedAbility>, Cloneable
         this.type = p.type;
     }
 
-//    public PurchasedAbility(StoredAbility p) {
-//        this.abilityName = p.getAbilityName();
-//        this.extName = p.getExtName();
-//        this.perms = new HashSet<String>();
+    public PurchasedAbility(StoredAbility p) {
+        this.abilityName = p.getAbilityName();
+        this.extName = p.getExtName();
+        this.perms = new HashSet<String>();
+        this.perms = new StringSetWrapper(p.getPerms()).getSet();
+//        this.perms = p.getPerms();
 //        for (StringWrapper wrapped : p.getPerms()) {
 //            this.perms.add(wrapped.getString());
 //        }
-//        this.playerName = p.getPlayerName();
-//        this.world = p.getWorld();
-//        this.duration = p.getDuration();
-//        this.type = p.getType();
-//    }
-//
-//    public StoredAbility toStore() {
-//        StoredAbility s = new StoredAbility();
+        this.playerName = p.getPlayerName();
+        this.world = p.getWorld();
+        this.duration = p.getDuration();
+        this.type = p.getType();
+    }
+
+    public StoredAbility toStore() {
+        StoredAbility s = new StoredAbility(this);
+        
 //        s.setAbilityName(abilityName);
 //        s.setDuration(duration);
 //        s.setExtName(extName);
@@ -103,8 +105,9 @@ public class PurchasedAbility implements Comparable<PurchasedAbility>, Cloneable
 //        s.setPlayerName(playerName);
 //        s.setType(type);
 //        s.setWorld(world);
-//        return s;
-//    }
+        
+        return s;
+    }
 
     @Override
     public Object clone() {
@@ -131,5 +134,99 @@ public class PurchasedAbility implements Comparable<PurchasedAbility>, Cloneable
             return false;
         return true;
     }
+
+    /** Given a type string, set our internal type.
+     * 
+     * @param typeString
+     */
+    public void setType(String typeString) throws BABException {
+		if(typeString.equalsIgnoreCase(PurchasedAbilityType.BUY.toString()))
+		{
+			setType(PurchasedAbilityType.BUY);
+		}
+		else if (typeString.equalsIgnoreCase(PurchasedAbilityType.RENT.toString()))
+		{
+			setType(PurchasedAbilityType.RENT);
+		}
+		else if (typeString.equalsIgnoreCase(PurchasedAbilityType.USE.toString()))
+		{
+			setType(PurchasedAbilityType.USE);
+		}
+		else {
+			throw new BABException("Invalid type string: "+typeString);
+		}
+    }
+    
+    /** Return the Ability object this PurchasedAbility node is associated with.
+     * 
+     * @return
+     */
+    public Ability getAssociatedAbility() {
+    	return BuyAbilities.getPlugin().getSettings().getAbility(abilityName);
+    }
+    
+	public String getAbilityName() {
+		return abilityName;
+	}
+
+	public String getExtName() {
+		return extName;
+	}
+
+	public Set<String> getPerms() {
+		return perms;
+		
+//		Ability ability = getAssociatedAbility();
+//		
+//		if( ability == null ) {
+//			throw new NullPointerException("ability is null");
+//		}
+//		
+//		return ability.perms;
+	}
+
+	public String getPlayerName() {
+		return playerName;
+	}
+
+	public String getWorld() {
+		return world;
+	}
+
+	public PurchasedAbilityType getType() {
+		return type;
+	}
+
+	public int getDuration() {
+		return duration;
+	}
+
+	public void setAbilityName(String abilityName) {
+		this.abilityName = abilityName;
+	}
+
+	public void setExtName(String extName) {
+		this.extName = extName;
+	}
+
+	public void setPerms(Set<String> perms) {
+		this.perms = perms;
+	}
+
+	public void setPlayerName(String playerName) {
+		this.playerName = playerName;
+	}
+
+	public void setWorld(String world) {
+		this.world = world;
+	}
+
+	public void setType(PurchasedAbilityType type) {
+		this.type = type;
+	}
+
+	public void setDuration(int duration) {
+		this.duration = duration;
+	}
 
 }
